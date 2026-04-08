@@ -30,11 +30,13 @@ resource "aws_instance" "ec2" {
   docker pull ${var.ecr_url}:fe-v1
   docker pull ${var.ecr_url}:be-v1
 
-  # Run containers
+  # Create network
   docker network create app-net
 
+  # MongoDB
   docker run -d --name mongodb --network app-net mongo
 
+  # Backend
   docker run -d --name backend --network app-net -p 3000:3000 \
     -e BUCKET_NAME=${var.bucket_name} \
     -e SECRET_NAME=${var.secret_name} \
@@ -42,6 +44,7 @@ resource "aws_instance" "ec2" {
     -e MONGO_PORT=27017 \
     ${var.ecr_url}:be-v1
 
+  # Frontend
   docker run -d --name frontend -p 80:80 \
     ${var.ecr_url}:fe-v1
 

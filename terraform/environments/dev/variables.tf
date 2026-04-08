@@ -1,5 +1,4 @@
 variable "region" {}
-variable "instance_type" {}
 variable "vpc_name" {}
 variable "subnet_name" {}
 variable "sg_name" {}
@@ -11,5 +10,6 @@ variable "secret_name" {}
 variable "cidr_block" {}
 variable "subnet_cidr" {}
 variable "key_name" {}
+
 variable "mongo_username" {}
 variable "mongo_password" {}

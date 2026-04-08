@@ -29,13 +29,13 @@ module "s3" {
 module "ecr" {
   source      = "../../modules/ecr"
   repo_name   = var.repo_name
-  environment = "dev"   # ✅ REQUIRED here
+  environment = "dev"
 }
 
 module "secrets" {
   source      = "../../modules/secrets"
   secret_name = var.secret_name
-  environment = "dev"   # 🔥 ADD THIS
+  environment = "dev"   # ✅ YOU WERE MISSING THIS EARLIER
 
   username = var.mongo_username
   password = var.mongo_password
@@ -44,14 +44,11 @@ module "secrets" {
 }
 
 module "ec2" {
-  source          = "../../modules/ec2"
-  instance_name   = var.instance_name
-  subnet_id       = module.vpc.subnet_id
-  sg_id           = module.sg.sg_id
-  iam_profile     = module.iam.instance_profile
-  key_name        = var.key_name
+  source = "../../modules/ec2"
 
-  ecr_url     = module.ecr.repository_url
-  bucket_name = var.bucket_name
-  secret_name = var.secret_name
+  instance_name = var.instance_name
+  subnet_id     = module.vpc.subnet_id
+  sg_id         = module.sg.sg_id
+  iam_profile   = module.iam.instance_profile   # ✅ CONNECTED
+  key_name      = var.key_name
 }

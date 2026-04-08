@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "secret" {
-  name = var.secret_name
+  name = "${var.secret_name}-${var.environment}"
 }
 
 resource "aws_secretsmanager_secret_version" "value" {
