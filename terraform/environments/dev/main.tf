@@ -62,5 +62,7 @@ module "ec2" {
   mongo_username = local.mongo_creds.username
   mongo_password = local.mongo_creds.password
   ecr_url        = var.ecr_url
+  bucket_name = var.bucket_name
+  secret_name = var.secret_name
 
 }

@@ -16,7 +16,7 @@ key_name = "dev"
 mongo_username = "clickops_admin"
 mongo_password = "StrongPassword123"
 
-ecr_url = "031277186489.dkr.ecr.ap-south-1.amazonaws.com/clickops-repo"
+
 ecr_url     = "031277186489.dkr.ecr.ap-south-1.amazonaws.com/clickops-repo"
 bucket_name = "clickops-bucket-preethi"   # your S3 bucket
 secret_name = "mongo-secret"
