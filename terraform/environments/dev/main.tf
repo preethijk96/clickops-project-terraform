@@ -35,6 +35,7 @@ module "ecr" {
 module "secrets" {
   source      = "../../modules/secrets"
   secret_name = var.secret_name
+  environment = "dev"   # 🔥 ADD THIS
 
   username = var.mongo_username
   password = var.mongo_password
