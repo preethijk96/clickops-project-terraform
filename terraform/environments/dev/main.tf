@@ -42,6 +42,14 @@ module "secrets" {
   host     = "mongodb"
   port     = 27017
 }
+data "aws_secretsmanager_secret_version" "mongo" {
+  secret_id = var.secret_name
+}
+
+locals {
+  mongo_creds = jsondecode(data.aws_secretsmanager_secret_version.mongo.secret_string)
+}
+
 
 module "ec2" {
   source = "../../modules/ec2"
@@ -50,5 +58,9 @@ module "ec2" {
   subnet_id     = module.vpc.subnet_id
   sg_id         = module.sg.sg_id
   iam_profile   = module.iam.instance_profile   # ✅ CONNECTED
-  key_name      = var.key_name
+  key_name      = var.key_namemongo_username = var.mongo_username
+  mongo_username = local.mongo_creds.username
+  mongo_password = local.mongo_creds.password
+  ecr_url        = var.ecr_url
+
 }
