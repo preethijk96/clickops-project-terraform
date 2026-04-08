@@ -17,4 +17,6 @@ variable "host" {
 variable "port" {
   type = number
 }
-variable "environment" {}
+variable "environment" {
+  type = string
+}
