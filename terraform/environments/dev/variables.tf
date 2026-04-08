@@ -10,8 +10,5 @@ variable "secret_name" {}
 variable "cidr_block" {}
 variable "subnet_cidr" {}
 variable "key_name" {}
-
-variable "mongo_username" {}
-variable "mongo_password" {}
 variable "ecr_url" {}
   

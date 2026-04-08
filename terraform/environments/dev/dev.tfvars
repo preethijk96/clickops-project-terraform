@@ -8,9 +8,7 @@ sg_name = "clickops-sg-dev"
 instance_name = "clickops-ec2-dev"
 
 iam_role = "clickops-iam-role-dev"
-bucket_name = "clickops-s3-dev-12345"
 repo_name = "clickops-ecr-dev"
-secret_name = "mongo-secret"
 
 cidr_block = "10.0.0.0/16"
 subnet_cidr = "10.0.1.0/24"
@@ -19,3 +17,6 @@ mongo_username = "clickops_admin"
 mongo_password = "StrongPassword123"
 
 ecr_url = "031277186489.dkr.ecr.ap-south-1.amazonaws.com/clickops-repo"
+ecr_url     = "031277186489.dkr.ecr.ap-south-1.amazonaws.com/clickops-repo"
+bucket_name = "clickops-bucket-preethi"   # your S3 bucket
+secret_name = "mongo-secret"
