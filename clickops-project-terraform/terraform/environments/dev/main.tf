@@ -38,17 +38,18 @@ module "ec2" {
 
   vpc_id    = module.vpc.vpc_id
   subnet_id = module.vpc.subnet_id
-  sg_name   = "dev-sg"
+  sg_name   = var.sg_name
 
-  ec2_name  = "dev-ec2"
-  ami       = "ami-0f5ee92e2d63afc18"
-  instance_type = "t2.micro"
-  key_name  = var.key_name
+  ec2_name      = var.ec2_name
+  key_name      = var.key_name
+  ami           = "ami-0f5ee92e2d63afc18"
+  instance_type = var.instance_type
 
   instance_profile = module.iam.instance_profile
 
-  region = var.region
-  secret_name = "mongo-creds"
+  region      = var.region
+  secret_name = var.secret_name
+  bucket_name = var.bucket_name   ✅ ADD THIS
 
   frontend_image = module.ecr.frontend_repo_url
   backend_image  = module.ecr.backend_repo_url
