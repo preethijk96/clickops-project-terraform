@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Employee App</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background: #4facfe;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #007bff;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Employee Form 🚀</h1>
+
+    <!-- IMPORTANT CHANGE HERE -->
+    <form action="http://<EC2-IP>:3000/add" method="POST" enctype="multipart/form-data">
+
+        <input name="name" placeholder="Enter Name"><br>
+        <input name="age" placeholder="Enter Age"><br>
+        <input type="file" name="image"><br>
+
+        <button>Submit</button>
+
+    </form>
+</div>
+
+</body>
+</html>

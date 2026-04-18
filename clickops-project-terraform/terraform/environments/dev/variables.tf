@@ -1,0 +1,11 @@
+variable "region" {}
+variable "vpc_name" {}
+variable "subnet_name" {}
+variable "sg_name" {}
+variable "ec2_name" {}
+variable "bucket_name" {}
+variable "ecr_name" {}
+variable "secret_name" {}
+variable "key_name" {}
+variable "iam_role" {}
+variable "instance_type" {}
