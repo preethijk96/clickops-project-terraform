@@ -49,7 +49,7 @@ module "ec2" {
 
   region      = var.region
   secret_name = var.secret_name
-  bucket_name = var.bucket_name   ✅ ADD THIS
+  bucket_name = var.bucket_name   
 
   frontend_image = module.ecr.frontend_repo_url
   backend_image  = module.ecr.backend_repo_url
