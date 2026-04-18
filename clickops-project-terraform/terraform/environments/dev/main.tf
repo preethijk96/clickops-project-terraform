@@ -43,7 +43,7 @@ module "s3" {
 module "ecr" {
   source = "../../modules/ecr"
 
-  ecr_name    = var.ecr_name
+  repo_name   = var.ecr_name
   environment = "dev"
 }
 
