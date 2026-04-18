@@ -23,8 +23,9 @@ module "iam" {
 }
 
 module "ecr" {
-  source      = "../../modules/ecr"
-  ecr_name    = "clickops"
+  source = "../../modules/ecr"
+
+  repo_name   = var.ecr_name
   environment = "dev"
 }
 
