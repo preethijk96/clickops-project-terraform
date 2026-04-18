@@ -25,7 +25,7 @@ module "iam" {
 module "ecr" {
   source = "../../modules/ecr"
 
-  repo_name   = var.ecr_name
+  ecr_name    = var.ecr_name
   environment = "dev"
 }
 
