@@ -16,3 +16,6 @@ variable "repo_name" {
 variable "environment" {
   type = string
 }
+variable "secret_name" {
+  type = string
+}

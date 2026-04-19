@@ -81,7 +81,7 @@ module "ec2" {
 
   region      = var.region
   bucket_name = var.bucket_name
-  secret_name = var.secret_name
+  secret_name = module.secrets.secret_name
 
   frontend_image = module.ecr.frontend_repo_url
   backend_image  = module.ecr.backend_repo_url
