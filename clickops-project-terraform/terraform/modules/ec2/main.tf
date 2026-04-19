@@ -17,9 +17,7 @@ resource "aws_security_group" "sg" {
   }
 }
 
-data "aws_secretsmanager_secret_version" "mongo" {
-  secret_id = var.secret_name
-}
+data.aws_secretsmanager_secret_version.mongo.secret_string
 
 locals {
   mongo_creds = jsondecode(data.aws_secretsmanager_secret_version.mongo.secret_string)
