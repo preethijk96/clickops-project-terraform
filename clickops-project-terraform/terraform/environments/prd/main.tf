@@ -9,8 +9,8 @@ module "vpc" {
   source      = "../../modules/vpc"
   cidr_block  = "10.0.0.0/16"
   subnet_cidr = "10.0.1.0/24"
-  vpc_name    = "clickops-vpc-prd"
-  subnet_name = "clickops-subnet-prd"
+  vpc_name    = "clickops-vpc-${var.environment}"
+  subnet_name = "clickops-subnet-${var.environment}"
 }
 
 ############################
@@ -18,7 +18,7 @@ module "vpc" {
 ############################
 module "iam" {
   source    = "../../modules/iam"
-  role_name = "clickops-role-prd"
+  role_name = "clickops-role-${var.environment}"
 
   policy_arns = [
     "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
@@ -42,11 +42,11 @@ module "s3" {
 ############################
 module "ecr" {
   source      = "../../modules/ecr"
-
   repo_name   = var.repo_name
   environment = var.environment
   ecr_name    = var.ecr_name
 }
+
 ############################
 # SECRETS
 ############################
@@ -58,7 +58,7 @@ module "secrets" {
   password    = "password123"
   host        = "mongodb"
   port        = 27017
-  environment = "prd"
+  environment = var.environment
 }
 
 ############################
@@ -70,9 +70,9 @@ module "ec2" {
   vpc_id    = module.vpc.vpc_id
   subnet_id = module.vpc.subnet_id
 
-  sg_name = "clickops-sg-prd"
+  sg_name  = "clickops-sg-${var.environment}"
+  ec2_name = "clickops-ec2-${var.environment}"
 
-  ec2_name      = "clickops-ec2-prd"
   key_name      = var.key_name
   ami           = var.ami
   instance_type = var.instance_type
