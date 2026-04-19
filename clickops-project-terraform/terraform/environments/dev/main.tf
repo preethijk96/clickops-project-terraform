@@ -41,8 +41,10 @@ module "s3" {
 # ECR
 ############################
 module "ecr" {
-  source    = "../../modules/ecr"
-  ecr_name  = var.ecr_name
+  source      = "../../modules/ecr"
+
+  repo_name   = var.repo_name
+  environment = var.environment
 }
 ############################
 # SECRETS
