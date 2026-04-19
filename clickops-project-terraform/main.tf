@@ -1,18 +1,7 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
 
-provider "aws" {
-  region = var.region
-}
 
 module "environment" {
-  source = "./terraform/environments/${var.environment}"
+ source = "./terraform/environments/dev"
 
   region          = var.region
   instance_type   = var.instance_type

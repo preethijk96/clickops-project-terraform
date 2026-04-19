@@ -18,10 +18,4 @@ variable "key_name" {}
 
 variable "mongo_username" {}
 variable "mongo_password" {}
-variable "region" {
-  default = "ap-south-1"
-}
 
-variable "environment" {
-  description = "dev / qa / prd"
-}
