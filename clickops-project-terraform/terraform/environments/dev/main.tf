@@ -70,9 +70,9 @@ module "ec2" {
   vpc_id    = module.vpc.vpc_id
   subnet_id = module.vpc.subnet_id
 
-  sg_name = "clickops-sg-dev"
+  sg_name  = "clickops-sg-${var.environment}"
+  ec2_name = "clickops-ec2-${var.environment}"
 
-  ec2_name      = "clickops-ec2-dev"
   key_name      = var.key_name
   ami           = var.ami
   instance_type = var.instance_type
@@ -81,7 +81,9 @@ module "ec2" {
 
   region      = var.region
   bucket_name = var.bucket_name
-  secret_name = module.secrets.secret_name
+
+  
+  secret_string = module.secrets.secret_string
 
   frontend_image = module.ecr.frontend_repo_url
   backend_image  = module.ecr.backend_repo_url
