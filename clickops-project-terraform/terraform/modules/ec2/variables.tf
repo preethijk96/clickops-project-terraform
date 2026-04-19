@@ -10,7 +10,6 @@ variable "ec2_name" {}
 variable "region" {}
 
 variable "bucket_name" {}
-variable "secret_name" {}
 variable "frontend_image" {}
 variable "backend_image" {}
 variable "secret_string" {
