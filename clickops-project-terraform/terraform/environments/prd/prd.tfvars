@@ -1,16 +1,11 @@
-region = "ap-south-1"
+region         = "ap-south-1"
+key_name       = "your-key"
+ami            = "ami-0f5ee92e2d63afc18"
+instance_type  = "t3.medium"
 
-vpc_name       = "clickops-vpc-prd"
-subnet_name    = "clickops-subnet-prd"
-sg_name        = "clickops-sg-prd"
-instance_name  = "clickops-ec2-prd"
+bucket_name = "clickops-bucket-prd"
+secret_name = "mongo-creds"
 
-iam_role   = "clickops-iam-role-prd"
-bucket_name = "clickops-s3-prd-12345"
-
-repo_name   = "clickops-ecr-prd"
-secret_name = "clickops-sm-prd"
-
-cidr_block   = "10.2.0.0/16"
-subnet_cidr  = "10.2.1.0/24"
-key_name     = "prd"
+repo_name   = "clickops-app"
+environment = "prd"
+ecr_name    = "clickops-ecr"
