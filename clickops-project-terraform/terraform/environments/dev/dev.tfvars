@@ -7,3 +7,4 @@ bucket_name = "clickops-bucket-dev"
 secret_name = "mongo-creds"
 
 repo_name = "clickops-ecr-dev"
+ecr_name = "clickops-dev-ecr"
