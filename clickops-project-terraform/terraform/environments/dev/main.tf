@@ -45,6 +45,7 @@ module "ecr" {
 
   repo_name   = var.repo_name
   environment = var.environment
+  ecr_name    = var.ecr_name
 }
 ############################
 # SECRETS

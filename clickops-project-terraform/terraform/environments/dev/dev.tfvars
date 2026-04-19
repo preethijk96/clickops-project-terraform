@@ -6,7 +6,6 @@ instance_type  = "t3.micro"
 bucket_name = "clickops-bucket-dev"
 secret_name = "mongo-creds"
 
-repo_name = "clickops-ecr-dev"
-ecr_name = "clickops-dev-ecr"
-
+repo_name   = "clickops-app"
 environment = "dev"
+ecr_name    = "clickops-ecr"
