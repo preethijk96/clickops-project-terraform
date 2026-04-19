@@ -17,10 +17,10 @@ resource "aws_security_group" "sg" {
   }
 }
 
-data.aws_secretsmanager_secret_version.mongo.secret_string
+#data.aws_secretsmanager_secret_version.mongo.secret_string
 
 locals {
-  mongo_creds = jsondecode(data.aws_secretsmanager_secret_version.mongo.secret_string)
+  mongo_creds = jsondecode(var.secret_string)
 }
 
 resource "aws_key_pair" "deployer" {
