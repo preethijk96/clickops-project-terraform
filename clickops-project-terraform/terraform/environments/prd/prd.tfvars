@@ -1,5 +1,5 @@
 region         = "ap-south-1"
-key_name       = "your-key"
+key_name = "clickops-key"
 ami            = "ami-0f5ee92e2d63afc18"
 instance_type  = "t3.medium"
 

@@ -23,17 +23,14 @@ locals {
   mongo_creds = jsondecode(var.secret_string)
 }
 
-resource "aws_key_pair" "deployer" {
-  key_name   = "clickops-key"
-  public_key = file("/root/.ssh/id_rsa.pub")
-}
+
 
 
 resource "aws_instance" "ec2" {
   ami           = var.ami
   instance_type = var.instance_type
   subnet_id     = var.subnet_id
-  key_name = aws_key_pair.deployer.key_name
+  key_name = var.key_name
 
   vpc_security_group_ids = [aws_security_group.sg.id]
   iam_instance_profile   = var.instance_profile
