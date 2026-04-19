@@ -53,7 +53,7 @@ module "ecr" {
 module "secrets" {
   source = "../../modules/secrets"
 
-  secret_string = module.secrets.secret_string
+  secret_name = var.secret_name
   username    = "admin"
   password    = "password123"
   host        = "mongodb"
