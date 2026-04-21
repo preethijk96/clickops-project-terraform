@@ -13,9 +13,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - ENV=dev
-      - MONGO_HOST=mongodb
-      - MONGO_PORT=27017
+      ENV: dev
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
     depends_on:
       - mongodb
 
