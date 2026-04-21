@@ -11,3 +11,14 @@ resource "aws_secretsmanager_secret_version" "value" {
     port     = var.port
   })
 }
+resource "aws_secretsmanager_secret" "mongo" {
+  name = "clickops-sm-dev"
+}
+
+resource "aws_secretsmanager_secret_version" "mongo" {
+  secret_id     = aws_secretsmanager_secret.mongo.id
+  secret_string = jsonencode({
+    host = "mongo"
+    port = 27017
+  })
+}

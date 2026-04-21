@@ -8,4 +8,4 @@ secret_name = "mongo-creds"
 
 repo_name   = "clickops-app"
 environment = "dev"
-ecr_name    = "clickops-ecr"
+ecr_name = "clickops-ecr-dev"

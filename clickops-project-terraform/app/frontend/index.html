@@ -1,35 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>clickops entry app</title>
+<title>ClickOps Terraform Project</title>
 
 <style>
 body {
     font-family: Arial;
-    background: linear-gradient(to right, #4facfe, #00f2fe);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-.container {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    width: 350px;
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.2);
+    background: linear-gradient(to right, #2193b0, #6dd5ed);
     text-align: center;
 }
+
+.container {
+    background: white;
+    padding: 25px;
+    width: 350px;
+    margin: auto;
+    margin-top: 60px;
+    border-radius: 15px;
+}
+
 input {
     width: 90%;
     padding: 10px;
-    margin: 10px 0;
+    margin: 8px;
 }
+
 button {
-    background: #4facfe;
-    color: white;
-    padding: 10px 20px;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.card {
+    background: white;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 10px;
+    width: 300px;
 }
 </style>
 </head>
@@ -37,19 +44,84 @@ button {
 <body>
 
 <div class="container">
-    <h1>Employee Form 🚀</h1>
+    <!-- ✅ FIXED TITLE -->
+    <h2>Welcome to ClickOps Terraform Project 2026 🚀</h2>
 
-    <!-- ✅ FIXED -->
-    <form action="http://43.205.233.139:5000/add" method="POST" enctype="multipart/form-data">
+    <form id="form">
+        <input name="name" placeholder="Enter Name" required><br>
+        <input name="age" placeholder="Enter Age" required><br>
+        <input type="file" name="image" required><br>
 
-        <input name="name" placeholder="Enter Name"><br>
-        <input name="age" placeholder="Enter Age"><br>
-        <input type="file" name="image"><br>
-
-        <button>Submit</button>
-
+        <button type="submit">Submit</button>
+        <button type="reset">Cancel</button>
     </form>
+
+    <h3 id="msg"></h3>
 </div>
+
+<div id="data"></div>
+
+<script>
+// ✅ CHANGE ONLY THIS PER ENV
+const ENV = "dev";  // dev / qa / prd
+
+// ✅ UPDATE EC2 IP
+const API = "http://<EC2-PUBLIC-IP>:3000";
+
+// ✅ AUTO BUCKET BASED ON ENV
+const BUCKET = `clickops-s3-${ENV}`;
+
+
+// 🔁 FORM SUBMIT
+document.getElementById("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    try {
+        const formData = new FormData(e.target);
+
+        const res = await fetch(`${API}/add`, {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        document.getElementById("msg").innerText = data.message;
+
+        loadData();
+    } catch (err) {
+        document.getElementById("msg").innerText = "Error submitting form ❌";
+        console.error(err);
+    }
+});
+
+
+// 🔁 LOAD DATA
+async function loadData() {
+    try {
+        const res = await fetch(`${API}/list`);
+        const users = await res.json();
+
+        const div = document.getElementById("data");
+        div.innerHTML = "";
+
+        users.forEach(u => {
+            div.innerHTML += `
+            <div class="card">
+                <p><b>${u.name}</b> (${u.age})</p>
+                <img src="https://${BUCKET}.s3.amazonaws.com/${u.image}" width="120"/>
+            </div>
+            `;
+        });
+
+    } catch (err) {
+        console.error("Error loading data:", err);
+    }
+}
+
+// 🔁 INITIAL LOAD
+loadData();
+</script>
 
 </body>
 </html>
