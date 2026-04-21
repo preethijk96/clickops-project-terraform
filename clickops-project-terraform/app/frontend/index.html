@@ -54,8 +54,18 @@ button {
 <div id="data"></div>
 
 <script>
-const API = "http://<EC2-PUBLIC-IP>:5000";
-const BUCKET = "<YOUR_BUCKET_NAME>";
+const API = "http://13.232.195.102:5000";
+
+// ENV (match backend)
+const ENV = "dev";
+
+const bucketMap = {
+    dev: "clickops-bucket-dev",
+    qa: "clickops-bucket-qa",
+    prd: "clickops-bucket-prd"
+};
+
+const BUCKET = bucketMap[ENV];
 
 document.getElementById("form").addEventListener("submit", async (e) => {
     e.preventDefault();

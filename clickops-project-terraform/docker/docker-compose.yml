@@ -11,8 +11,7 @@ services:
     environment:
       - MONGO_HOST=mongodb
       - MONGO_PORT=27017
-      - SECRET_NAME=clickops-secret
-      - AWS_REGION=ap-south-1
+      - ENV=dev   # 🔁 change to qa / prd when needed
     depends_on:
       - mongodb
 
