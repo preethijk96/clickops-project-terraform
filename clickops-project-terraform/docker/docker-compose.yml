@@ -1,26 +1,23 @@
-version: "3.8"
-
 services:
   mongodb:
     image: mongo
-    container_name: mongodb
     ports:
       - "27017:27017"
 
   backend:
     build: ../app/backend
-    container_name: backend
     ports:
       - "5000:3000"
     environment:
       - MONGO_HOST=mongodb
       - MONGO_PORT=27017
+      - SECRET_NAME=clickops-secret
+      - AWS_REGION=ap-south-1
     depends_on:
       - mongodb
 
   frontend:
     build: ../app/frontend
-    container_name: frontend
     ports:
       - "3000:80"
     depends_on:

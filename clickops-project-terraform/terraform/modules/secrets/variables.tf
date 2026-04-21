@@ -20,3 +20,6 @@ variable "port" {
 variable "environment" {
   type = string
 }
+variable "bucket_name" {
+  default = "your-s3-bucket-name"
+}
