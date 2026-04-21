@@ -3,17 +3,17 @@ version: "3.8"
 services:
   mongodb:
     image: mongo
-    container_name: mongodb-${ENV}
+    container_name: mongodb
     ports:
-      - "${MONGO_PORT}:27017"
+      - "27017:27017"
 
   backend:
     build: ../app/backend
-    container_name: backend-${ENV}
+    container_name: backend
     ports:
-      - "${BACKEND_PORT}:3000"
+      - "3000:3000"
     environment:
-      - ENV=${ENV}
+      - ENV=dev
       - MONGO_HOST=mongodb
       - MONGO_PORT=27017
     depends_on:
@@ -21,8 +21,8 @@ services:
 
   frontend:
     build: ../app/frontend
-    container_name: frontend-${ENV}
+    container_name: frontend
     ports:
-      - "${FRONTEND_PORT}:80"
+      - "8080:80"
     depends_on:
       - backend
