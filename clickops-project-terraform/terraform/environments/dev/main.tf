@@ -65,26 +65,20 @@ module "secrets" {
 # EC2
 ############################
 module "ec2" {
-  source = "../../modules/ec2"
 
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = module.vpc.subnet_id
+ source = "../../modules/ec2"
 
-  sg_name  = "clickops-sg-${var.environment}"
-  ec2_name = "clickops-ec2-${var.environment}"
+ ami              = var.ami
+ instance_type    = var.instance_type
+ key_name         = var.key_name
 
-  key_name      = var.key_name
-  ami           = var.ami
-  instance_type = var.instance_type
+ subnet_id        = module.vpc.subnet_id
+ vpc_id           = module.vpc.vpc_id
 
-  instance_profile = module.iam.instance_profile
+ instance_profile = module.iam.instance_profile
 
-  region      = var.region
-  bucket_name = var.bucket_name
+ sg_name          = "clickops-sg-dev"
 
-  
-  secret_string = module.secrets.secret_string
-
-  frontend_image = module.ecr.frontend_repo_url
-  backend_image  = module.ecr.backend_repo_url
+ instance_name    = "clickops-ec2-dev"
+}
 }
