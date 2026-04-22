@@ -1,105 +1,128 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>ClickOps Terraform Project</title>
+<title>ClickOps Students Entry Form </title>
 
 <style>
-body {
-    font-family: Arial;
-    background: linear-gradient(to right, #2193b0, #6dd5ed);
-    text-align: center;
+body{
+background:linear-gradient(to right,#5b6cf9,#a96ef7);
+font-family:Arial;
+text-align:center;
 }
-.container {
-    background: white;
-    padding: 25px;
-    width: 350px;
-    margin: auto;
-    margin-top: 60px;
-    border-radius: 15px;
+
+.box{
+background:white;
+width:400px;
+margin:auto;
+margin-top:60px;
+padding:30px;
+border-radius:18px;
+box-shadow:0 5px 20px gray;
 }
-input {
-    width: 90%;
-    padding: 10px;
-    margin: 8px;
+
+input{
+width:90%;
+padding:10px;
+margin:8px;
 }
-button {
-    padding: 10px;
-    margin: 5px;
+
+button{
+padding:10px 18px;
+border:none;
+border-radius:8px;
+background:#4169e1;
+color:white;
 }
-.card {
-    background: white;
-    margin: 10px;
-    padding: 10px;
-    border-radius: 10px;
+
+.card{
+background:white;
+width:300px;
+margin:auto;
+margin-top:20px;
+padding:20px;
+border-radius:15px;
 }
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="container">
-    <h2>Welcome to ClickOps Terraform Project 2026</h2>
+<div class="box">
+<h2>ClickOps Students Entry Form</h2>
 
-    <form id="form">
-        <input name="name" placeholder="Enter Name" required><br>
-        <input name="age" placeholder="Enter Age" required><br>
-        <input type="file" name="image" required><br>
+<form id="form">
+<input name="name" placeholder="Enter your name" required>
 
-        <button type="submit">Submit</button>
-    </form>
+<input name="age" placeholder="Enter your age" required>
 
-    <h3 id="msg"></h3>
+<input type="file" name="image" required>
+
+<button type="submit">
+Submit
+</button>
+</form>
+
+<h3 id="msg"></h3>
+
 </div>
 
-<div id="data"></div>
+<div id="records"></div>
 
 <script>
-const API = "http://13.232.195.102:5000";
 
-const ENV = "dev";
+const API=window.location.origin.replace(":80",":5000");
 
-const bucketMap = {
-    dev: "clickops-bucket-dev",
-    qa: "clickops-bucket-qa",
-    prd: "clickops-bucket-prd"
-};
+document.getElementById("form").addEventListener(
+"submit",
+async(e)=>{
+e.preventDefault();
 
-const BUCKET = bucketMap[ENV];
+let formData=new FormData(e.target);
 
-document.getElementById("form").addEventListener("submit", async (e) => {
-    e.preventDefault();
+let res=await fetch(
+`${API}/add`,
+{
+method:"POST",
+body:formData
+}
+);
 
-    const formData = new FormData(e.target);
+let data=await res.json();
 
-    const res = await fetch(`${API}/add`, {
-        method: "POST",
-        body: formData
-    });
+document.getElementById("msg").innerHTML=data.message;
 
-    const data = await res.json();
-    document.getElementById("msg").innerText = data.message;
+e.target.reset();
 
-    loadData();
+loadData();
+
+}
+);
+
+
+async function loadData(){
+
+let res=await fetch(`${API}/list`);
+
+let users=await res.json();
+
+let html="";
+
+users.forEach(u=>{
+html+=`
+<div class='card'>
+<h3>${u.name}</h3>
+<p>Age ${u.age}</p>
+<img src="${u.image}" width="150">
+</div>
+`
 });
 
-async function loadData() {
-    const res = await fetch(`${API}/list`);
-    const users = await res.json();
+document.getElementById("records").innerHTML=html;
 
-    const div = document.getElementById("data");
-    div.innerHTML = "";
-
-    users.forEach(u => {
-        div.innerHTML += `
-        <div class="card">
-            <p><b>${u.name}</b> (${u.age})</p>
-            <img src="https://${BUCKET}.s3.amazonaws.com/${u.image}" width="120"/>
-        </div>
-        `;
-    });
 }
 
 loadData();
+
 </script>
 
 </body>

@@ -1,61 +1,83 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import boto3
-import os
+import boto3, os, uuid
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app)
 
-# ENV (dev / qa / prd)
-env = os.getenv("ENV", "dev")
+# -------- ENV --------
+AWS_REGION = os.getenv("AWS_REGION","ap-south-1")
+S3_BUCKET  = os.getenv("S3_BUCKET")
 
-# MongoDB
-client = MongoClient(f"mongodb://{os.getenv('MONGO_HOST')}:{os.getenv('MONGO_PORT')}")
-db = client["clickops"]
-collection = db["users"]
+MONGO_HOST = os.getenv("MONGO_HOST","mongodb")
+MONGO_PORT = os.getenv("MONGO_PORT","27017")
 
-# S3 bucket mapping
-bucket_map = {
-    "dev": "clickops-bucket-dev",
-    "qa": "clickops-bucket-qa",
-    "prd": "clickops-bucket-prd"
-}
+# -------- Mongo --------
+client = MongoClient(
+    f"mongodb://{MONGO_HOST}:{MONGO_PORT}"
+)
 
-bucket = bucket_map.get(env, "clickops-bucket-dev")
+db=client.clickops
+users=db.users
 
-# S3 client
-s3 = boto3.client("s3", region_name="ap-south-1")
+# -------- S3 ----------
+s3=boto3.client("s3",region_name=AWS_REGION)
+
 
 @app.route("/")
 def home():
-    return jsonify({"message": f"Welcome from backend ({env}) 🚀"})
+    return jsonify({"status":"running"})
 
-@app.route("/add", methods=["POST"])
+
+@app.route("/add",methods=["POST"])
 def add():
-    name = request.form.get("name")
-    age = request.form.get("age")
-    file = request.files["image"]
 
-    filename = secure_filename(file.filename)
+    name=request.form.get("name")
+    age=request.form.get("age")
 
-    # Upload to S3
-    s3.upload_fileobj(file, bucket, filename)
+    if "image" not in request.files:
+        return jsonify({"error":"No image"}),400
 
-    # Save to MongoDB
-    collection.insert_one({
-        "name": name,
-        "age": age,
-        "image": filename
+    file=request.files["image"]
+
+    ext=file.filename.split(".")[-1]
+    filename=f"{uuid.uuid4()}.{ext}"
+
+    # upload to s3
+    s3.upload_fileobj(
+        file,
+        S3_BUCKET,
+        filename,
+        ExtraArgs={"ACL":"public-read"}
+    )
+
+    image_url=f"https://{S3_BUCKET}.s3.amazonaws.com/{filename}"
+
+    doc={
+        "name":name,
+        "age":age,
+        "image":image_url
+    }
+
+    users.insert_one(doc)
+
+    return jsonify({
+        "message":"Image Submitted Successfully",
+        "user":doc
     })
 
-    return jsonify({"message": f"User added successfully in {env} 🎉"})
 
-@app.route("/list", methods=["GET"])
+@app.route("/list")
 def list_users():
-    users = list(collection.find({}, {"_id": 0}))
-    return jsonify(users)
+    data=[]
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000)
+    for x in users.find({},{"_id":0}):
+        data.append(x)
+
+    return jsonify(data)
+
+
+if __name__=="__main__":
+    app.run(host="0.0.0.0",port=3000)
