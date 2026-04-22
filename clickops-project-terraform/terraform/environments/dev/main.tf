@@ -34,16 +34,16 @@ module "secrets" {
 module "ec2" {
   source = "../../modules/ec2"
 
-  ami              = var.ami
-  instance_type    = var.instance_type
-  key_name         = var.key_name
+  ami           = var.ami
+  instance_type = var.instance_type
+  key_name      = var.key_name
 
-  subnet_id        = module.vpc.subnet_id
-  vpc_id           = module.vpc.vpc_id
+  subnet_id = module.vpc.subnet_id
+  vpc_id    = module.vpc.vpc_id
 
   instance_profile = module.iam.instance_profile
 
-  sg_name          = "clickops-sg-dev"
+  sg_name = "clickops-sg-dev"
 
-  instance_name    = "clickops-ec2-dev"
+  instance_name = "clickops-ec2-dev"
 }
