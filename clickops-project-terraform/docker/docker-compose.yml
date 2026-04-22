@@ -32,7 +32,7 @@ services:
       S3_BUCKET: clickops-bucket-dev
 
     volumes:
-      - ~/.aws:/root/.aws:ro
+      - /home/ubuntu/.aws:/root/.aws:ro
 
     depends_on:
       - mongodb
