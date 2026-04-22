@@ -1,12 +1,12 @@
 resource "aws_secretsmanager_secret" "secret" {
-  name = var.secret_name
+ name = var.secret_name
 }
 
 resource "aws_secretsmanager_secret_version" "value" {
-  secret_id = aws_secretsmanager_secret.secret.id
+ secret_id = aws_secretsmanager_secret.secret.id
 
-  secret_string = jsonencode({
-    username = "admin"
-    password = "admin123"
-  })
+ secret_string = jsonencode({
+   username = "admin"
+   password = "admin123"
+ })
 }
