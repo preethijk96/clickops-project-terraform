@@ -2,15 +2,7 @@ provider "aws" {
   region = var.region
 }
 
-module "vpc" {
-  source = "../../modules/vpc"
 
-  cidr_block  = "10.0.0.0/16"
-  subnet_cidr = "10.0.1.0/24"
-
-  vpc_name    = "clickops-vpc-dev"
-  subnet_name = "clickops-subnet-dev"
-}
 
 module "iam" {
   source = "../../modules/iam"
@@ -38,9 +30,9 @@ module "ec2" {
   instance_type = var.instance_type
   key_name      = var.key_name
 
-  subnet_id = module.vpc.subnet_id
-  vpc_id    = module.vpc.vpc_id
-
+  
+subnet_id = "subnet-0be968429cbed7843"
+vpc_id    = "vpc-063aa8818d9de4b22"
   instance_profile = module.iam.instance_profile
 
   sg_name = "clickops-sg-dev"
