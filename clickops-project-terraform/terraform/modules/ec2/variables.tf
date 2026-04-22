@@ -1,20 +1,31 @@
-variable "sg_name" {}
-variable "vpc_id" {}
-variable "ami" {}
-variable "instance_type" {}
-variable "subnet_id" {}
-variable "key_name" {}
-variable "instance_profile" {}
-variable "ec2_name" {}
-
-variable "region" {}
-
-variable "bucket_name" {}
-variable "frontend_image" {}
-variable "backend_image" {}
-variable "secret_string" {
-  type      = string
-  sensitive = true
+variable "ami" {
+ type = string
 }
 
-variable "instance_name" {}
+variable "instance_type" {
+ type = string
+}
+
+variable "key_name" {
+ type = string
+}
+
+variable "subnet_id" {
+ type = string
+}
+
+variable "vpc_id" {
+ type = string
+}
+
+variable "instance_profile" {
+ type = string
+}
+
+variable "sg_name" {
+ type = string
+}
+
+variable "instance_name" {
+ type = string
+}
