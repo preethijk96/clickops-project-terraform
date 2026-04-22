@@ -16,3 +16,5 @@ variable "secret_string" {
   type      = string
   sensitive = true
 }
+
+variable "instance_name" {}
