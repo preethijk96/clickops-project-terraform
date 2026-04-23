@@ -55,8 +55,18 @@ module "ecr" {
 #################################
 
 module "secrets" {
- source      = "../../modules/secrets"
- secret_name = var.secret_name
+
+ source = "../../modules/secrets"
+
+ secret_name = "clickops-sm-${var.environment}"
+
+ username = "admin"
+ password = "Password123"
+
+ host = "mongodb"
+ port = "27017"
+
+ environment = var.environment
 }
 
 #################################
