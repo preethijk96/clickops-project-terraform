@@ -4,8 +4,8 @@ ami            = "ami-0f58b397bc5c1f2e8"
 instance_type  = "t3.micro"
 
 bucket_name = "clickops-bucket-qa"
-secret_name = "mongo-creds-qa"
 
+secret_name = "clickops-sm-qa"
 repo_name   = "clickops-app"
 environment = "qa"
 ecr_name    = "clickops-ecr-qa"
