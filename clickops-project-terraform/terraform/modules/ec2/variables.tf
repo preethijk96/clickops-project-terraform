@@ -29,3 +29,6 @@ variable "sg_name" {
 variable "instance_name" {
  type = string
 }
+variable "root_volume_size" {
+ type = number
+}

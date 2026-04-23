@@ -2,88 +2,39 @@ provider "aws" {
   region = var.region
 }
 
-############################
-# VPC
-############################
-module "vpc" {
-  source      = "../../modules/vpc"
-  cidr_block  = "10.0.0.0/16"
-  subnet_cidr = "10.0.1.0/24"
-  vpc_name    = "clickops-vpc-${var.environment}"
-  subnet_name = "clickops-subnet-${var.environment}"
-}
 
-############################
-# IAM
-############################
+
 module "iam" {
-  source    = "../../modules/iam"
-  role_name = "clickops-role-${var.environment}"
-
-  policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess",
-    "arn:aws:iam::aws:policy/SecretsManagerReadWrite",
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  ]
+  source = "../../modules/iam"
 }
 
-############################
-# S3
-############################
 module "s3" {
   source      = "../../modules/s3"
   bucket_name = var.bucket_name
 }
 
-############################
-# ECR
-############################
 module "ecr" {
-  source      = "../../modules/ecr"
-  repo_name   = var.repo_name
-  environment = var.environment
-  ecr_name    = var.ecr_name
+  source    = "../../modules/ecr"
+  repo_name = var.ecr_name
 }
 
-############################
-# SECRETS
-############################
 module "secrets" {
-  source = "../../modules/secrets"
-
+  source      = "../../modules/secrets"
   secret_name = var.secret_name
-  username    = "admin"
-  password    = "password123"
-  host        = "mongodb"
-  port        = 27017
-  environment = var.environment
 }
 
-############################
-# EC2
-############################
 module "ec2" {
-  source = "../../modules/ec2"
 
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = module.vpc.subnet_id
+ source = "../../modules/ec2"
 
-  sg_name  = "clickops-sg-${var.environment}"
-  ec2_name = "clickops-ec2-${var.environment}"
+ ami               = "ami-0f58b397bc5c1f2e8"
+ instance_type     = "t3.micro"
+ key_name          = "your-key"
+ subnet_id         = "your-subnet-id"
+ vpc_id            = "your-vpc-id"
+ sg_name           = "qa-sg"
+ instance_profile  = "ec2-role"
+ instance_name     = "qa-server"
 
-  key_name      = var.key_name
-  ami           = var.ami
-  instance_type = var.instance_type
-
-  instance_profile = module.iam.instance_profile
-
-  region      = var.region
-  bucket_name = var.bucket_name
-
-  secret_string = module.secrets.secret_string
-
-  frontend_image = module.ecr.frontend_repo_url
-  backend_image  = module.ecr.backend_repo_url
+ root_volume_size  = 30
 }

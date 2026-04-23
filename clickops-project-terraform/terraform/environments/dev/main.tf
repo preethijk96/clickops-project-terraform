@@ -24,18 +24,17 @@ module "secrets" {
 }
 
 module "ec2" {
-  source = "../../modules/ec2"
 
-  ami           = var.ami
-  instance_type = var.instance_type
-  key_name      = var.key_name
+ source = "../../modules/ec2"
 
-  
-subnet_id = "subnet-0be968429cbed7843"
-vpc_id    = "vpc-063aa8818d9de4b22"
-  instance_profile = module.iam.instance_profile
+ ami               = "ami-0f58b397bc5c1f2e8"
+ instance_type     = "t3.micro"
+ key_name          = "your-key"
+ subnet_id         = "your-subnet-id"
+ vpc_id            = "your-vpc-id"
+ sg_name           = "dev-sg"
+ instance_profile  = "ec2-role"
+ instance_name     = "dev-server"
 
-  sg_name = "clickops-sg-dev"
-
-  instance_name = "clickops-ec2-dev"
+ root_volume_size  = 20
 }
