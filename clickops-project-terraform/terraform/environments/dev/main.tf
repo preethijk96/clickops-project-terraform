@@ -34,14 +34,19 @@ module "ec2" {
 
  source = "../../modules/ec2"
 
- ami               = "ami-0f58b397bc5c1f2e8"
- instance_type     = "t3.micro"
- key_name          = "your-key"
- subnet_id         = "your-subnet-id"
- vpc_id            = "your-vpc-id"
- sg_name           = "dev-sg"
- instance_profile = module.iam.instance_profile_name
- instance_name     = "dev-server"
+ ami           = "ami-0f58b397bc5c1f2e8"
+ instance_type = "t3.micro"
 
- root_volume_size  = 20
+ key_name  = "dev"   # your actual key pair
+
+ subnet_id = "subnet-xxxxxxxx"
+ vpc_id    = "vpc-xxxxxxxx"
+
+ sg_name   = "dev-sg"
+
+ instance_profile = module.iam.instance_profile_name
+
+ instance_name = "dev-server"
+
+ root_volume_size = 20
 }
