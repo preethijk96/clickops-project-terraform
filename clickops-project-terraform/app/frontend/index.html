@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>ClickOps Students Entry Form </title>
+<title>ClickOps Students Entry Form</title>
 
 <style>
 body{
 background:linear-gradient(to right,#5b6cf9,#a96ef7);
 font-family:Arial;
 text-align:center;
+margin:0;
+padding:0;
 }
 
 .box{
@@ -24,6 +26,8 @@ input{
 width:90%;
 padding:10px;
 margin:8px;
+border:1px solid #ccc;
+border-radius:6px;
 }
 
 button{
@@ -32,6 +36,11 @@ border:none;
 border-radius:8px;
 background:#4169e1;
 color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#274fcf;
 }
 
 .card{
@@ -41,6 +50,17 @@ margin:auto;
 margin-top:20px;
 padding:20px;
 border-radius:15px;
+box-shadow:0 3px 10px lightgray;
+}
+
+.card img{
+margin-top:10px;
+border-radius:8px;
+}
+
+#msg{
+color:green;
+margin-top:15px;
 }
 </style>
 
@@ -50,16 +70,30 @@ border-radius:15px;
 <div class="box">
 <h2>ClickOps Students Entry Form</h2>
 
-<form id="form">
-<input name="name" placeholder="Enter your name" required>
+<form id="form" enctype="multipart/form-data">
 
-<input name="age" placeholder="Enter your age" required>
+<input
+name="name"
+placeholder="Enter your name"
+required
+>
 
-<input type="file" name="image" required>
+<input
+name="age"
+placeholder="Enter your age"
+required
+>
+
+<input
+type="file"
+name="image"
+required
+>
 
 <button type="submit">
 Submit
 </button>
+
 </form>
 
 <h3 id="msg"></h3>
@@ -68,18 +102,25 @@ Submit
 
 <div id="records"></div>
 
+
 <script>
 
-const API = window.location.protocol + "//" + window.location.hostname + ":5000";+
+// Backend API
+const API = window.location.protocol + "//" + window.location.hostname + ":5000";
 
+
+// Submit form
 document.getElementById("form").addEventListener(
 "submit",
-async(e)=>{
+async function(e){
+
 e.preventDefault();
 
-let formData=new FormData(e.target);
+let formData = new FormData(e.target);
 
-let res=await fetch(
+try{
+
+let res = await fetch(
 `${API}/add`,
 {
 method:"POST",
@@ -87,37 +128,54 @@ body:formData
 }
 );
 
-let data=await res.json();
+let data = await res.json();
 
-document.getElementById("msg").innerHTML=data.message;
+document.getElementById("msg").innerHTML =
+data.message || "Student saved successfully";
 
 e.target.reset();
 
 loadData();
 
 }
+catch(err){
+document.getElementById("msg").innerHTML="Submit failed";
+console.log(err);
+}
+
+}
 );
 
 
+// Load records
 async function loadData(){
 
-let res=await fetch(`${API}/list`);
+try{
 
-let users=await res.json();
+let res = await fetch(`${API}/students`);
+
+let users = await res.json();
 
 let html="";
 
 users.forEach(u=>{
+
 html+=`
 <div class='card'>
 <h3>${u.name}</h3>
 <p>Age ${u.age}</p>
 <img src="${u.image}" width="150">
 </div>
-`
+`;
+
 });
 
 document.getElementById("records").innerHTML=html;
+
+}
+catch(err){
+console.log(err);
+}
 
 }
 
