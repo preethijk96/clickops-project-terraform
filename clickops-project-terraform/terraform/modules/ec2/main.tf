@@ -1,8 +1,10 @@
 resource "aws_security_group" "sg" {
+  name        = "${var.instance_name}-sg"
+  description = "ClickOps security group"
+  vpc_id      = data.aws_vpc.default.id
 
-  name   = var.sg_name
-  vpc_id = var.vpc_id
 
+  # SSH
   ingress {
     from_port   = 22
     to_port     = 22
@@ -10,6 +12,8 @@ resource "aws_security_group" "sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+
+  # Existing app ports
   ingress {
     from_port   = 80
     to_port     = 80
@@ -24,6 +28,40 @@ resource "aws_security_group" "sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+
+  # ----------------------------
+  # Multi Environment Backend Ports
+  # DEV=5001 QA=5002 PRD=5003
+  # ----------------------------
+  ingress {
+    from_port   = 5001
+    to_port     = 5003
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  # ----------------------------
+  # Multi Environment Frontend Ports
+  # DEV=8081 QA=8082 PRD=8083
+  # ----------------------------
+  ingress {
+    from_port   = 8081
+    to_port     = 8083
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  # Mongo optional
+  ingress {
+    from_port   = 27017
+    to_port     = 27019
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -31,39 +69,9 @@ resource "aws_security_group" "sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-}
-
-
-resource "aws_instance" "ec2" {
-
-  ami                    = var.ami
-  instance_type          = var.instance_type
-  key_name               = var.key_name
-  subnet_id              = var.subnet_id
-
-  vpc_security_group_ids = [
-    aws_security_group.sg.id
-  ]
-
-  iam_instance_profile = var.instance_profile
-
-  associate_public_ip_address = true
-
-
-  
-  root_block_device {
-      volume_size = var.root_volume_size
-      volume_type = "gp3"
-      encrypted   = true
-  }
-  
-
   tags = {
-    Name = var.instance_name
+    Name = "${var.instance_name}-sg"
   }
-
 }
 
-output "instance_public_ip" {
- value = aws_instance.ec2.public_ip
-}
+
