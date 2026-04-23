@@ -79,7 +79,7 @@ module "ec2" {
 
  instance_profile = module.iam.instance_profile
 
- instance_name = "dev-server"
+ instance_name = "clickops-ec2-dev1"
 
  root_volume_size = 20
 }
