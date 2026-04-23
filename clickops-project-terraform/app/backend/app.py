@@ -1,13 +1,13 @@
 from flask import Flask,request,jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
-import boto3
+import boto3,uuid
 
 app=Flask(__name__)
 CORS(app)
 
 mongo=MongoClient("mongodb://mongodb:27017/")
-db=mongo.students
+db=mongo.clickops
 
 bucket="clickops-bucket-dev"
 
@@ -18,48 +18,37 @@ region_name="ap-south-1"
 
 @app.route("/")
 def home():
-    return "Backend running"
+    return jsonify({"message":"Backend running"})
 
 @app.route("/add",methods=["POST"])
 def add():
+    try:
+        name=request.form["name"]
+        age=request.form["age"]
+        image=request.files["image"]
 
-    name=request.form["name"]
-    age=request.form["age"]
-    file=request.files["image"]
+        filename=str(uuid.uuid4())+"-"+image.filename
 
-    filename=file.filename
+        s3.upload_fileobj(
+            image,
+            bucket,
+            filename
+        )
 
-    s3.upload_fileobj(
-      file,
-      bucket,
-      filename
-    )
+        image_url=f"https://{bucket}.s3.amazonaws.com/{filename}"
 
-    url=f"https://{bucket}.s3.amazonaws.com/{filename}"
+        db.records.insert_one({
+            "name":name,
+            "age":age,
+            "image":image_url
+        })
 
-    db.records.insert_one({
-      "name":name,
-      "age":age,
-      "image":url
-    })
+        return jsonify({
+         "message":"Saved in MongoDB and image uploaded to S3"
+        })
 
-    return jsonify({
-      "message":"Student saved successfully"
-    })
-
-
-@app.route("/list")
-def list_data():
-
-    users=[]
-
-    for x in db.records.find({},{"_id":0}):
-        users.append(x)
-
-    return jsonify(users)
+    except Exception as e:
+        return jsonify({"error":str(e)}),500
 
 
-app.run(
- host="0.0.0.0",
- port=3000
-)
+app.run(host="0.0.0.0",port=5000)
