@@ -34,15 +34,14 @@ module "ec2" {
 
  source = "../../modules/ec2"
 
- ami           = "ami-0f58b397bc5c1f2e8"
- instance_type = "t3.micro"
+ ami           = var.ami
+ instance_type = var.instance_type
+ key_name      = var.key_name
 
- key_name  = "dev"   # your actual key pair
+ subnet_id = data.aws_subnets.default.ids[0]
+ vpc_id    = data.aws_vpc.default.id
 
- subnet_id = "subnet-xxxxxxxx"
- vpc_id    = "vpc-xxxxxxxx"
-
- sg_name   = "dev-sg"
+ sg_name = "dev-sg"
 
  instance_profile = module.iam.instance_profile_name
 
