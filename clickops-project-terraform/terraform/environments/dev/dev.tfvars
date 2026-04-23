@@ -11,6 +11,7 @@ environment = "dev"
 ecr_name    = "clickops-ecr-dev"
 root_volume_size = 20
 
+instance_name = "clickops-ec2-dev1"
 
 
 
