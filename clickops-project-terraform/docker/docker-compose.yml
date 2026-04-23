@@ -1,28 +1,80 @@
+version: "3.8"
+
 services:
 
- mongodb:
+# ---------------- DEV ----------------
+mongodb-dev:
   image: mongo:latest
-  container_name: mongodb
+  container_name: mongodb-dev
   ports:
-   - "27017:27017"
+    - "27017:27017"
 
- backend:
-  build: .
-  container_name: docker_backend
+backend-dev:
+  build: ../app/backend
+  container_name: backend-dev
   ports:
-   - "5000:5000"
-
+    - "5001:5000"
   environment:
-   ENVIRONMENT: ${ENVIRONMENT}
-   BUCKET_NAME: ${BUCKET_NAME}
-
+    ENVIRONMENT: dev
+    BUCKET_NAME: clickops-bucket-dev
+    DB_NAME: clickops-dev
   depends_on:
-   - mongodb
+    - mongodb-dev
 
- frontend:
-  build:
-   context: .
-   dockerfile: Dockerfile.frontend
-  container_name: docker_frontend
+frontend-dev:
+  build: ../app/frontend
+  container_name: frontend-dev
   ports:
-   - "80:80"
+    - "8081:80"
+
+
+# ---------------- QA ----------------
+mongodb-qa:
+  image: mongo:latest
+  container_name: mongodb-qa
+  ports:
+    - "27018:27017"
+
+backend-qa:
+  build: ../app/backend
+  container_name: backend-qa
+  ports:
+    - "5002:5000"
+  environment:
+    ENVIRONMENT: qa
+    BUCKET_NAME: clickops-bucket-qa
+    DB_NAME: clickops-qa
+  depends_on:
+    - mongodb-qa
+
+frontend-qa:
+  build: ../app/frontend
+  container_name: frontend-qa
+  ports:
+    - "8082:80"
+
+
+# ---------------- PRD ----------------
+mongodb-prd:
+  image: mongo:latest
+  container_name: mongodb-prd
+  ports:
+    - "27019:27017"
+
+backend-prd:
+  build: ../app/backend
+  container_name: backend-prd
+  ports:
+    - "5003:5000"
+  environment:
+    ENVIRONMENT: prd
+    BUCKET_NAME: clickops-bucket-prd
+    DB_NAME: clickops-prd
+  depends_on:
+    - mongodb-prd
+
+frontend-prd:
+  build: ../app/frontend
+  container_name: frontend-prd
+  ports:
+    - "8083:80"
