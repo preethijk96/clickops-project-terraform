@@ -5,7 +5,14 @@ provider "aws" {
 
 
 module "iam" {
-  source = "../../modules/iam"
+ source = "../../modules/iam"
+
+ role_name = "clickops-ec2-role"
+
+ policy_arns = [
+   "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+   "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+ ]
 }
 
 module "s3" {
