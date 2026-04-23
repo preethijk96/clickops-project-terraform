@@ -75,7 +75,7 @@ module "ec2" {
  subnet_id = data.aws_subnets.default.ids[0]
  vpc_id    = data.aws_vpc.default.id
 
- sg_name = "dev-sg"
+ sg_name = "clickops-sg-dev"
 
  instance_profile = module.iam.instance_profile
 
