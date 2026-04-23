@@ -40,7 +40,7 @@ module "ec2" {
  subnet_id         = "your-subnet-id"
  vpc_id            = "your-vpc-id"
  sg_name           = "dev-sg"
- instance_profile  = "ec2-role"
+ instance_profile = module.iam.instance_profile_name
  instance_name     = "dev-server"
 
  root_volume_size  = 20
