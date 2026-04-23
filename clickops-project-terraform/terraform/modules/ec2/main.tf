@@ -50,14 +50,13 @@ resource "aws_instance" "ec2" {
   associate_public_ip_address = true
 
 
-  # ---------- ADD THIS ----------
+  
   root_block_device {
       volume_size = var.root_volume_size
       volume_type = "gp3"
       encrypted   = true
   }
-  # ------------------------------
-
+  
 
   tags = {
     Name = var.instance_name
