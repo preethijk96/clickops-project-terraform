@@ -1,37 +1,7 @@
-variable "ami" {
- type = string
-}
-
-variable "instance_type" {
- type = string
-}
-
-variable "key_name" {
- type = string
-}
-
-variable "subnet_id" {
- type = string
-}
-
-variable "vpc_id" {
- type = string
-}
-
-variable "instance_profile" {
- type = string
-}
-
-variable "sg_name" {
- type = string
-}
-
-variable "instance_name" {
- type = string
-}
-variable "root_volume_size" {
- type = number
-}
 variable "environment" {}
-variable "backend_port" {}
+variable "ami" {}
+variable "instance_type" {}
+variable "key_name" {}
+variable "root_volume_size" {}
 variable "frontend_port" {}
+variable "backend_port" {}

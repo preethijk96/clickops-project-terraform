@@ -1,23 +1,7 @@
-variable "region" {}
-variable "key_name" {}
+variable "environment" {}
 variable "ami" {}
 variable "instance_type" {}
-
-variable "bucket_name" {}
-variable "ecr_name" {
-  type = string
-}
-variable "repo_name" {
-  type = string
-}
-
-variable "environment" {
-  type = string
-}
-variable "secret_name" {
-  type = string
-}
-variable "instance_name" {}
-variable "root_volume_size" {
- type = number
-}
+variable "key_name" {}
+variable "root_volume_size" {}
+variable "frontend_port" {}
+variable "backend_port" {}

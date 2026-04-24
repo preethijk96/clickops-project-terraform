@@ -1,21 +1,48 @@
+terraform {
+  required_version = ">=1.5.0"
 
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~>5.0"
+    }
+  }
+}
 
-module "environment" {
- source = "./terraform/environments/dev"
+provider "aws" {
+  region = "ap-south-1"
+}
 
-  region          = var.region
-  instance_type   = var.instance_type
-  vpc_name        = var.vpc_name
-  subnet_name     = var.subnet_name
-  sg_name         = var.sg_name
-  instance_name   = var.instance_name
-  iam_role        = var.iam_role
-  bucket_name     = var.bucket_name
-  repo_name       = var.repo_name
-  secret_name     = var.secret_name
-  cidr_block      = var.cidr_block
-  subnet_cidr     = var.subnet_cidr
-  key_name        = var.key_name
-  mongo_username  = var.mongo_username
-  mongo_password  = var.mongo_password
+locals {
+  environments = {
+    dev = {
+      frontend_port = 8081
+      backend_port  = 5001
+    }
+
+    qa = {
+      frontend_port = 8082
+      backend_port  = 5002
+    }
+
+    prd = {
+      frontend_port = 8083
+      backend_port  = 5003
+    }
+  }
+}
+
+module "clickops" {
+  for_each = local.environments
+
+  source = "./modules/environment"
+
+  environment      = each.key
+  frontend_port    = each.value.frontend_port
+  backend_port     = each.value.backend_port
+
+  ami              = "ami-0f5ee92e2d63afc18"
+  instance_type    = "t3.micro"
+  key_name         = "dev"
+  root_volume_size = 20
 }
