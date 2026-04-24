@@ -22,12 +22,10 @@ services:
     depends_on:
       - mongodb-dev
 
-  frontend-dev:
-    build: ../app/frontend
-    container_name: frontend-dev
-    ports:
-      - "8081:80"
-
+  
+frontend-dev:
+  ports:
+    - "80:80"
 
 
   mongodb-qa:
