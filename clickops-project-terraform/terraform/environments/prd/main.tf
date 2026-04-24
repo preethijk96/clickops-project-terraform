@@ -81,5 +81,4 @@ module "ec2" {
 
 instance_name = var.instance_name
 
- root_volume_size = 20
-}
+ root_volume_size = var.root_volume_size

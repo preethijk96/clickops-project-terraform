@@ -18,3 +18,6 @@ variable "secret_name" {
   type = string
 }
 variable "instance_name" {}
+variable "root_volume_size" {
+ type = number
+}
