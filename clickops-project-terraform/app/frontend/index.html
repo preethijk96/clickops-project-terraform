@@ -61,6 +61,7 @@ border-radius:8px;
 #msg{
 color:green;
 margin-top:15px;
+font-weight:bold;
 }
 </style>
 
@@ -68,6 +69,7 @@ margin-top:15px;
 <body>
 
 <div class="box">
+
 <h2>ClickOps Students Entry Form</h2>
 
 <form id="form" enctype="multipart/form-data">
@@ -102,25 +104,33 @@ Submit
 
 <div id="records"></div>
 
-
 <script>
 
-// Backend API
-const API = window.location.protocol + "//" + window.location.hostname + ":5000";
+/* AUTO SELECT BACKEND PORT */
+const portMap={
+"8081":"5001",
+"8082":"5002",
+"8083":"5003"
+};
+
+const API=
+window.location.protocol+"//"+
+window.location.hostname+":"+
+portMap[window.location.port];
 
 
-// Submit form
+/* SUBMIT FORM */
 document.getElementById("form").addEventListener(
 "submit",
 async function(e){
 
 e.preventDefault();
 
-let formData = new FormData(e.target);
+let formData=new FormData(e.target);
 
 try{
 
-let res = await fetch(
+let res=await fetch(
 `${API}/add`,
 {
 method:"POST",
@@ -128,9 +138,9 @@ body:formData
 }
 );
 
-let data = await res.json();
+let data=await res.json();
 
-document.getElementById("msg").innerHTML =
+document.getElementById("msg").innerHTML=
 data.message || "Student saved successfully";
 
 e.target.reset();
@@ -139,32 +149,39 @@ loadData();
 
 }
 catch(err){
-document.getElementById("msg").innerHTML="Submit failed";
+
+document.getElementById("msg").innerHTML=
+"Submit failed";
+
 console.log(err);
+
 }
 
 }
 );
 
 
-// Load records
+/* LOAD STUDENTS */
 async function loadData(){
 
 try{
 
-let res = await fetch(`${API}/students`);
+let res=await fetch(
+`${API}/`
+);
 
-let users = await res.json();
+let users=await res.json();
 
 let html="";
 
-users.forEach(u=>{
+users.forEach(function(u){
 
 html+=`
 <div class='card'>
 <h3>${u.name}</h3>
 <p>Age ${u.age}</p>
 <img src="${u.image}" width="150">
+<p>${u.environment}</p>
 </div>
 `;
 
@@ -174,7 +191,9 @@ document.getElementById("records").innerHTML=html;
 
 }
 catch(err){
+
 console.log(err);
+
 }
 
 }
