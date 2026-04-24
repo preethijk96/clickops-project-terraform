@@ -5,7 +5,7 @@ instance_type  = "t3.micro"
 
 bucket_name = "clickops-bucket-qa"
 
-secret_name = "clickops-sm-qa"
+secret_name = "clickops-qa-secret"
 repo_name   = "clickops-app"
 environment = "qa"
 ecr_name    = "clickops-ecr-qa"

@@ -17,3 +17,4 @@ variable "environment" {
 variable "secret_name" {
   type = string
 }
+variable "instance_name" {}
