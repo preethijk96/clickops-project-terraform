@@ -1,81 +1,72 @@
-resource "aws_security_group" "app_sg" {
- name = "clickops-${var.environment}-sg"
+resource "aws_security_group" "clickops_sg" {
+  name        = "${var.instance_name}-sg"
+  description = "Allow app traffic"
+  vpc_id      = var.vpc_id
 
- ingress {
-   from_port = 22
-   to_port   = 22
-   protocol  = "tcp"
-   cidr_blocks=["0.0.0.0/0"]
- }
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
- ingress {
-   from_port = var.frontend_port
-   to_port   = var.frontend_port
-   protocol  = "tcp"
-   cidr_blocks=["0.0.0.0/0"]
- }
+  ingress {
+    description = "Dev Frontend"
+    from_port   = 8081
+    to_port     = 8081
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
- ingress {
-   from_port = var.backend_port
-   to_port   = var.backend_port
-   protocol  = "tcp"
-   cidr_blocks=["0.0.0.0/0"]
- }
+  ingress {
+    description = "QA Frontend"
+    from_port   = 8082
+    to_port     = 8082
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
- egress {
-   from_port=0
-   to_port=0
-   protocol="-1"
-   cidr_blocks=["0.0.0.0/0"]
- }
-}
+  ingress {
+    description = "PRD Frontend"
+    from_port   = 8083
+    to_port     = 8083
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-resource "aws_instance" "app" {
- ami                    = var.ami
- instance_type          = var.instance_type
- key_name               = var.key_name
+  ingress {
+    description = "Dev Backend"
+    from_port   = 5001
+    to_port     = 5001
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
- vpc_security_group_ids = [
-   aws_security_group.app_sg.id
- ]
+  ingress {
+    description = "QA Backend"
+    from_port   = 5002
+    to_port     = 5002
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
- root_block_device {
-   volume_size = var.root_volume_size
-   volume_type = "gp3"
- }
+  ingress {
+    description = "PRD Backend"
+    from_port   = 5003
+    to_port     = 5003
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
- user_data = <<EOF
-#!/bin/bash
-apt update -y
-apt install -y docker.io openssh-server
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-systemctl enable ssh
-systemctl restart ssh
-
-usermod -s /bin/bash ubuntu
-
-mkdir -p /home/ubuntu/.ssh
-
-cat <<KEY >> /home/ubuntu/.ssh/authorized_keys
-PASTE_YOUR_PUBLIC_KEY_HERE
-KEY
-
-chmod 700 /home/ubuntu/.ssh
-chmod 600 /home/ubuntu/.ssh/authorized_keys
-chown -R ubuntu:ubuntu /home/ubuntu/.ssh
-
-systemctl restart ssh
-
-usermod -aG docker ubuntu
-systemctl enable docker
-systemctl start docker
-EOF
-
- tags = {
-   Name = "clickops-ec2-${var.environment}"
- }
-}
-
-output "public_ip" {
- value = aws_instance.app.public_ip
+  tags = {
+    Name = "${var.instance_name}-sg"
+  }
 }
