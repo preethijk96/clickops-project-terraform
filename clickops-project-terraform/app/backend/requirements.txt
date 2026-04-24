@@ -1,5 +1,4 @@
 flask
-flask-cors
-boto3
 pymongo
+boto3
 werkzeug

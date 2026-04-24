@@ -2,79 +2,93 @@ version: "3.8"
 
 services:
 
-# ---------------- DEV ----------------
-mongodb-dev:
-  image: mongo:latest
-  container_name: mongodb-dev
-  ports:
-    - "27017:27017"
-
-backend-dev:
-  build: ../app/backend
-  container_name: backend-dev
-  ports:
-    - "5001:5000"
-  environment:
-    ENVIRONMENT: dev
-    BUCKET_NAME: clickops-bucket-dev
-    DB_NAME: clickops-dev
-  depends_on:
-    - mongodb-dev
-
-frontend-dev:
-  build: ../app/frontend
-  container_name: frontend-dev
-  ports:
-    - "8081:80"
+  mongodb-dev:
+    image: mongo:latest
+    container_name: mongodb-dev
+    ports:
+      - "27017:27017"
 
 
-# ---------------- QA ----------------
-mongodb-qa:
-  image: mongo:latest
-  container_name: mongodb-qa
-  ports:
-    - "27018:27017"
-
-backend-qa:
-  build: ../app/backend
-  container_name: backend-qa
-  ports:
-    - "5002:5000"
-  environment:
-    ENVIRONMENT: qa
-    BUCKET_NAME: clickops-bucket-qa
-    DB_NAME: clickops-qa
-  depends_on:
-    - mongodb-qa
-
-frontend-qa:
-  build: ../app/frontend
-  container_name: frontend-qa
-  ports:
-    - "8082:80"
+  backend-dev:
+    build: ../app/backend
+    container_name: backend-dev
+    ports:
+      - "5001:5000"
+    environment:
+      ENVIRONMENT: dev
+      BUCKET_NAME: clickops-bucket-dev
+      DB_NAME: clickops-dev
+      AWS_ACCESS_KEY_ID: YOUR_KEY
+      AWS_SECRET_ACCESS_KEY: YOUR_SECRET
+      AWS_DEFAULT_REGION: ap-south-1
+    depends_on:
+      - mongodb-dev
 
 
-# ---------------- PRD ----------------
-mongodb-prd:
-  image: mongo:latest
-  container_name: mongodb-prd
-  ports:
-    - "27019:27017"
+  frontend-dev:
+    build: ../app/frontend
+    container_name: frontend-dev
+    ports:
+      - "8081:80"
 
-backend-prd:
-  build: ../app/backend
-  container_name: backend-prd
-  ports:
-    - "5003:5000"
-  environment:
-    ENVIRONMENT: prd
-    BUCKET_NAME: clickops-bucket-prd
-    DB_NAME: clickops-prd
-  depends_on:
-    - mongodb-prd
 
-frontend-prd:
-  build: ../app/frontend
-  container_name: frontend-prd
-  ports:
-    - "8083:80"
+
+  mongodb-qa:
+    image: mongo:latest
+    container_name: mongodb-qa
+    ports:
+      - "27018:27017"
+
+
+  backend-qa:
+    build: ../app/backend
+    container_name: backend-qa
+    ports:
+      - "5002:5000"
+    environment:
+      ENVIRONMENT: qa
+      BUCKET_NAME: clickops-bucket-qa
+      DB_NAME: clickops-qa
+      AWS_ACCESS_KEY_ID: YOUR_KEY
+      AWS_SECRET_ACCESS_KEY: YOUR_SECRET
+      AWS_DEFAULT_REGION: ap-south-1
+    depends_on:
+      - mongodb-qa
+
+
+  frontend-qa:
+    build: ../app/frontend
+    container_name: frontend-qa
+    ports:
+      - "8082:80"
+
+
+
+  mongodb-prd:
+    image: mongo:latest
+    container_name: mongodb-prd
+    ports:
+      - "27019:27017"
+
+
+  backend-prd:
+    build: ../app/backend
+    container_name: backend-prd
+    ports:
+      - "5003:5000"
+    environment:
+      ENVIRONMENT: prd
+      BUCKET_NAME: clickops-bucket-prd
+      DB_NAME: clickops-prd
+      AWS_ACCESS_KEY_ID: YOUR_KEY
+      AWS_SECRET_ACCESS_KEY: YOUR_SECRET
+      AWS_DEFAULT_REGION: ap-south-1
+    depends_on:
+      - mongodb-prd
+
+
+  frontend-prd:
+    build: ../app/frontend
+    container_name: frontend-prd
+    ports:
+      - "8083:80"
