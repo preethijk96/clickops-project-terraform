@@ -1,26 +1,25 @@
 resource "aws_security_group" "app_sg" {
-  name        = "clickops-sg-qa"
-  description = "Allow SSH and app ports"
+  name        = "${var.environment}-clickops-sg"
+  description = "Security group for ${var.environment}"
 
   ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port   = 5002
-    to_port     = 5002
-    protocol    = "tcp"
+    from_port = var.backend_port
+    to_port   = var.backend_port
+    protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port   = 8082
-    to_port     = 8082
-    protocol    = "tcp"
+    from_port = var.frontend_port
+    to_port   = var.frontend_port
+    protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -36,44 +35,36 @@ resource "aws_instance" "app" {
   ami                    = var.ami
   instance_type          = var.instance_type
   key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.app_sg.id]
 
-  vpc_security_group_ids = [
-    aws_security_group.app_sg.id
-  ]
-
-  user_data = <<-EOF
+  user_data = <<EOF
 #!/bin/bash
-apt-get update -y
-apt-get install -y openssh-server docker.io docker-compose
+apt update -y
+apt install -y openssh-server docker.io docker-compose
 
 systemctl enable ssh
 systemctl restart ssh
 
-# force ubuntu user shell
 usermod -s /bin/bash ubuntu
-
-# repair ubuntu shell files
 cp /etc/skel/.bashrc /home/ubuntu/.bashrc
 cp /etc/skel/.profile /home/ubuntu/.profile
 chown ubuntu:ubuntu /home/ubuntu/.bashrc /home/ubuntu/.profile
 
-# ssh hardening + key auth
-cat >> /etc/ssh/sshd_config <<EOT
-PubkeyAuthentication yes
-AuthorizedKeysFile .ssh/authorized_keys
-PasswordAuthentication no
-UsePAM yes
-EOT
+echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
+echo "AuthorizedKeysFile .ssh/authorized_keys" >> /etc/ssh/sshd_config
 
 systemctl restart ssh
-
-# docker startup
-usermod -aG docker ubuntu
 systemctl enable docker
 systemctl start docker
+usermod -aG docker ubuntu
 EOF
 
   tags = {
-    Name = "clickops-ec2-qa"
+    Name = "clickops-ec2-${var.environment}"
+    Environment = var.environment
   }
+}
+
+output "public_ip" {
+  value = aws_instance.app.public_ip
 }

@@ -32,3 +32,6 @@ variable "instance_name" {
 variable "root_volume_size" {
  type = number
 }
+variable "environment" {}
+variable "backend_port" {}
+variable "frontend_port" {}
