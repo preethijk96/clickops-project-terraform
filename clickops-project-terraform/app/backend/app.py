@@ -1,105 +1,70 @@
-from flask import Flask,request,jsonify
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from pymongo import MongoClient
-from werkzeug.utils import secure_filename
 import boto3
+import time
 import os
 
-app=Flask(__name__)
+app = Flask(__name__)
+CORS(app)
 
-ENVIRONMENT=os.getenv("ENVIRONMENT","dev")
+ENVIRONMENT = os.getenv("ENVIRONMENT")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+DB_NAME = os.getenv("DB_NAME")
 
-BUCKET_NAME=os.getenv(
-"BUCKET_NAME",
-f"clickops-bucket-{ENVIRONMENT}"
+# Connect to correct Mongo container based on environment
+client = MongoClient(f"mongodb://mongodb-{ENVIRONMENT}:27017/")
+db = client[DB_NAME]
+collection = db["records"]
+
+# S3 client
+s3 = boto3.client(
+    "s3",
+    region_name="ap-south-1"
 )
-
-DB_NAME=os.getenv(
-"DB_NAME",
-f"clickops-{ENVIRONMENT}"
-)
-
-client=MongoClient(f"mongodb://mongodb-{ENVIRONMENT}:27017/")
-
-db=client[DB_NAME]
-collection=db.students
-
-
-s3=boto3.client(
-"s3",
-region_name="ap-south-1",
-aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
-)
-
 
 @app.route("/")
 def home():
-    data=list(
-      collection.find({},{"_id":0})
+    return jsonify({
+        "environment": ENVIRONMENT,
+        "bucket": BUCKET_NAME,
+        "database": DB_NAME
+    })
+
+@app.route("/add", methods=["POST"])
+def add_student():
+
+    name = request.form["name"]
+    age = request.form["age"]
+    file = request.files["image"]
+
+    filename = str(int(time.time())) + ".jpg"
+
+    file.save("/tmp/" + filename)
+
+    s3.upload_file(
+        "/tmp/" + filename,
+        BUCKET_NAME,
+        filename
     )
-    return jsonify(data)
 
+    image_url = f"https://{BUCKET_NAME}.s3.ap-south-1.amazonaws.com/{filename}"
 
+    student = {
+        "name": name,
+        "age": age,
+        "image": image_url,
+        "environment": ENVIRONMENT
+    }
 
-@app.route("/students")
-def students():
+    result = collection.insert_one(student)
 
-    data=list(
-      collection.find({},{"_id":0})
-    )
+    student["_id"] = str(result.inserted_id)
 
-    return jsonify(data)
-
-
-
-@app.route("/add",methods=["POST"])
-def add():
-
-    try:
-
-        name=request.form["name"]
-        age=request.form["age"]
-
-        file=request.files["image"]
-
-        filename=secure_filename(
-          file.filename
-        )
-
-        filepath="/tmp/"+filename
-
-        file.save(filepath)
-
-        s3.upload_file(
-           filepath,
-           BUCKET_NAME,
-           filename
-        )
-
-        image_url=f"https://{BUCKET_NAME}.s3.ap-south-1.amazonaws.com/{filename}"
-
-        student={
-           "name":name,
-           "age":age,
-           "image":image_url,
-           "environment":ENVIRONMENT
-        }
-
-        
-
-    except Exception as e:
-
-        return jsonify({
-          "message":stresult = collection.insert_one(student)
-
-student["_id"] = str(result.inserted_id)
-
-return jsonify(student)r(e)
-        }),500
-
+    return jsonify(student)
 
 
 app.run(
-host="0.0.0.0",
-port=5000
+    host="0.0.0.0",
+    port=5000
 )
