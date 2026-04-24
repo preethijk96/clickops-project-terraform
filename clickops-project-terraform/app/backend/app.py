@@ -1,38 +1,32 @@
-from flask import Flask, request, jsonify
+from flask import Flask,request,jsonify
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 import boto3
 import os
 
-app = Flask(__name__)
+app=Flask(__name__)
 
-# Environment
-ENVIRONMENT = os.getenv("ENVIRONMENT","dev")
-BUCKET_NAME = os.getenv(
-    "BUCKET_NAME",
-    f"clickops-bucket-{ENVIRONMENT}"
-)
-DB_NAME = os.getenv(
-    "DB_NAME",
-    f"clickops-{ENVIRONMENT}"
+ENVIRONMENT=os.getenv("ENVIRONMENT","dev")
+
+BUCKET_NAME=os.getenv(
+"BUCKET_NAME",
+f"clickops-bucket-{ENVIRONMENT}"
 )
 
-# Mongo per environment
-mongo_hosts = {
-    "dev":"mongodb-dev",
-    "qa":"mongodb-qa",
-    "prd":"mongodb-prd"
-}
-
-client = MongoClient(
-f"mongodb://{mongo_hosts[ENVIRONMENT]}:27017/"
+DB_NAME=os.getenv(
+"DB_NAME",
+f"clickops-{ENVIRONMENT}"
 )
 
-db = client[DB_NAME]
-collection = db.students
+client=MongoClient(
+"mongodb://mongodb:27017/"
+)
 
-# S3
-s3 = boto3.client(
+db=client[DB_NAME]
+collection=db.students
+
+
+s3=boto3.client(
 "s3",
 region_name="ap-south-1",
 aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
@@ -48,16 +42,20 @@ def home():
     return jsonify(data)
 
 
+
 @app.route("/students")
 def students():
+
     data=list(
       collection.find({},{"_id":0})
     )
+
     return jsonify(data)
 
 
-@app.route("/add", methods=["POST"])
-def add_student():
+
+@app.route("/add",methods=["POST"])
+def add():
 
     try:
 
@@ -67,18 +65,17 @@ def add_student():
         file=request.files["image"]
 
         filename=secure_filename(
-            file.filename
+          file.filename
         )
 
         filepath="/tmp/"+filename
 
         file.save(filepath)
 
-        # upload to correct bucket
         s3.upload_file(
-            filepath,
-            BUCKET_NAME,
-            filename
+           filepath,
+           BUCKET_NAME,
+           filename
         )
 
         image_url=f"https://{BUCKET_NAME}.s3.ap-south-1.amazonaws.com/{filename}"
@@ -93,8 +90,8 @@ def add_student():
         collection.insert_one(student)
 
         return jsonify({
-           "message":"Student saved successfully",
-           "student":student
+          "message":"Student saved successfully",
+          "student":student
         })
 
     except Exception as e:
@@ -102,6 +99,7 @@ def add_student():
         return jsonify({
           "message":str(e)
         }),500
+
 
 
 app.run(

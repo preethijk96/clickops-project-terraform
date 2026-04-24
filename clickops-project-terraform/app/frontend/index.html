@@ -4,6 +4,7 @@
 <title>ClickOps Students Entry Form</title>
 
 <style>
+
 body{
 background:linear-gradient(to right,#5b6cf9,#a96ef7);
 font-family:Arial;
@@ -39,10 +40,6 @@ color:white;
 cursor:pointer;
 }
 
-button:hover{
-background:#274fcf;
-}
-
 .card{
 background:white;
 width:300px;
@@ -50,22 +47,11 @@ margin:auto;
 margin-top:20px;
 padding:20px;
 border-radius:15px;
-box-shadow:0 3px 10px lightgray;
 }
 
-.card img{
-margin-top:10px;
-border-radius:8px;
-}
-
-#msg{
-color:green;
-margin-top:15px;
-font-weight:bold;
-}
 </style>
-
 </head>
+
 <body>
 
 <div class="box">
@@ -76,13 +62,13 @@ font-weight:bold;
 
 <input
 name="name"
-placeholder="Enter your name"
+placeholder="Enter Name"
 required
 >
 
 <input
 name="age"
-placeholder="Enter your age"
+placeholder="Enter Age"
 required
 >
 
@@ -106,11 +92,10 @@ Submit
 
 <script>
 
-/* AUTO SELECT BACKEND PORT */
 const portMap={
-"8081":"5001",
-"8082":"5002",
-"8083":"5003"
+ "8081":"5001",
+ "8082":"5002",
+ "8083":"5003"
 };
 
 const API=
@@ -119,16 +104,17 @@ window.location.hostname+":"+
 portMap[window.location.port];
 
 
-/* SUBMIT FORM */
-document.getElementById("form").addEventListener(
+
+document.getElementById(
+"form"
+).addEventListener(
 "submit",
 async function(e){
 
 e.preventDefault();
 
-let formData=new FormData(e.target);
-
-try{
+let formData=
+new FormData(e.target);
 
 let res=await fetch(
 `${API}/add`,
@@ -138,39 +124,30 @@ body:formData
 }
 );
 
-let data=await res.json();
+let data=
+await res.json();
 
-document.getElementById("msg").innerHTML=
-data.message || "Student saved successfully";
+document.getElementById(
+"msg"
+).innerHTML=data.message;
 
 e.target.reset();
 
 loadData();
 
 }
-catch(err){
-
-document.getElementById("msg").innerHTML=
-"Submit failed";
-
-console.log(err);
-
-}
-
-}
 );
 
 
-/* LOAD STUDENTS */
 async function loadData(){
 
-try{
-
-let res=await fetch(
-`${API}/`
+let res=
+await fetch(
+`${API}/students`
 );
 
-let users=await res.json();
+let users=
+await res.json();
 
 let html="";
 
@@ -187,14 +164,9 @@ html+=`
 
 });
 
-document.getElementById("records").innerHTML=html;
-
-}
-catch(err){
-
-console.log(err);
-
-}
+document.getElementById(
+"records"
+).innerHTML=html;
 
 }
 
