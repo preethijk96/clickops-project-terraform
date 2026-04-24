@@ -85,17 +85,16 @@ def add():
            "environment":ENVIRONMENT
         }
 
-        collection.insert_one(student)
-
-        return jsonify({
-          "message":"Student saved successfully",
-          "student":student
-        })
+        
 
     except Exception as e:
 
         return jsonify({
-          "message":str(e)
+          "message":stresult = collection.insert_one(student)
+
+student["_id"] = str(result.inserted_id)
+
+return jsonify(student)r(e)
         }),500
 
 
