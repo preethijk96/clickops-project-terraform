@@ -1,33 +1,44 @@
-from flask import Flask,request,jsonify
+from flask import Flask, request, jsonify
 from pymongo import MongoClient
+from werkzeug.utils import secure_filename
 import boto3
 import os
-from werkzeug.utils import secure_filename
 
-app=Flask(__name__)
+app = Flask(__name__)
 
-ENV=os.getenv("ENVIRONMENT","dev")
-BUCKET=os.getenv("BUCKET_NAME",f"clickops-bucket-{ENV}")
-DB_NAME=os.getenv("DB_NAME",f"clickops-{ENV}")
+# Environment
+ENVIRONMENT = os.getenv("ENVIRONMENT","dev")
+BUCKET_NAME = os.getenv(
+    "BUCKET_NAME",
+    f"clickops-bucket-{ENVIRONMENT}"
+)
+DB_NAME = os.getenv(
+    "DB_NAME",
+    f"clickops-{ENVIRONMENT}"
+)
 
-# Environment specific Mongo
-mongo_hosts={
- "dev":"mongodb-dev",
- "qa":"mongodb-qa",
- "prd":"mongodb-prd"
+# Mongo per environment
+mongo_hosts = {
+    "dev":"mongodb-dev",
+    "qa":"mongodb-qa",
+    "prd":"mongodb-prd"
 }
 
-client=MongoClient(
-f"mongodb://{mongo_hosts[ENV]}:27017/"
+client = MongoClient(
+f"mongodb://{mongo_hosts[ENVIRONMENT]}:27017/"
 )
 
-db=client[DB_NAME]
-collection=db.students
+db = client[DB_NAME]
+collection = db.students
 
-s3=boto3.client(
+# S3
+s3 = boto3.client(
 "s3",
-region_name="ap-south-1"
+region_name="ap-south-1",
+aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 )
+
 
 @app.route("/")
 def home():
@@ -45,47 +56,49 @@ def students():
     return jsonify(data)
 
 
-@app.route("/add",methods=["POST"])
-def add():
+@app.route("/add", methods=["POST"])
+def add_student():
 
     try:
+
         name=request.form["name"]
         age=request.form["age"]
 
         file=request.files["image"]
 
         filename=secure_filename(
-           file.filename
+            file.filename
         )
 
-        path="/tmp/"+filename
+        filepath="/tmp/"+filename
 
-        file.save(path)
+        file.save(filepath)
 
-        # upload image to env bucket
+        # upload to correct bucket
         s3.upload_file(
-            path,
-            BUCKET,
+            filepath,
+            BUCKET_NAME,
             filename
         )
 
-        image_url=f"https://{BUCKET}.s3.ap-south-1.amazonaws.com/{filename}"
+        image_url=f"https://{BUCKET_NAME}.s3.ap-south-1.amazonaws.com/{filename}"
 
         student={
-          "name":name,
-          "age":age,
-          "image":image_url,
-          "environment":ENV
+           "name":name,
+           "age":age,
+           "image":image_url,
+           "environment":ENVIRONMENT
         }
 
         collection.insert_one(student)
 
         return jsonify({
-          "message":"Student saved successfully",
-          "student":student
+           "message":"Student saved successfully",
+           "student":student
         })
 
     except Exception as e:
+
         return jsonify({
           "message":str(e)
         }),500
