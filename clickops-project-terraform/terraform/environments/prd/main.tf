@@ -31,8 +31,7 @@ module "ec2" {
   root_volume_size = var.root_volume_size
 
   vpc_id           = module.vpc.vpc_id
-  subnet_id        = module.vpc.public_subnet_id
-
+  subnet_id = module.vpc.subnet_id
   instance_profile = module.iam.instance_profile
   sg_name          = "clickops-sg-${var.environment}"
 }
