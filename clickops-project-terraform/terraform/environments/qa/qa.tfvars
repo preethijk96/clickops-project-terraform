@@ -1,7 +1,7 @@
 region         = "ap-south-1"
 key_name = "qa"
-ami            = "ami-0f58b397bc5c1f2e8"
-instance_type  = "t3.micro"
+ami            = "ami-0f5ee92e2d63afc18"
+instance_type  = "t3.medium"
 
 bucket_name = "clickops-bucket-qa"
 
