@@ -50,3 +50,21 @@ resource "aws_route_table_association" "public_assoc" {
  route_table_id = aws_route_table.public_rt.id
 
 }
+
+resource "aws_security_group_rule" "frontend_ports" {
+  type              = "ingress"
+  from_port         = 8081
+  to_port           = 8083
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.app_sg.id
+}
+
+resource "aws_security_group_rule" "backend_ports" {
+  type              = "ingress"
+  from_port         = 5001
+  to_port           = 5003
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.app_sg.id
+}
