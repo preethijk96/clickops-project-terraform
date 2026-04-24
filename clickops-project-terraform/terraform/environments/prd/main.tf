@@ -22,14 +22,17 @@ module "secrets" {
 }
 
 module "ec2" {
- source = "../ec2"
+  source = "../../modules/ec2"
 
- environment       = var.environment
- ami               = var.ami
- instance_type     = var.instance_type
- key_name          = var.key_name
- root_volume_size  = var.root_volume_size
+  ami              = var.ami
+  instance_type    = var.instance_type
+  key_name         = var.key_name
+  instance_name    = "clickops-ec2-${var.environment}"
+  root_volume_size = var.root_volume_size
 
- frontend_port     = var.frontend_port
- backend_port      = var.backend_port
+  vpc_id           = module.vpc.vpc_id
+  subnet_id        = module.vpc.public_subnet_id
+
+  instance_profile = module.iam.instance_profile
+  sg_name          = "clickops-sg-${var.environment}"
 }
