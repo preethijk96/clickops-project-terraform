@@ -12,12 +12,10 @@ ENVIRONMENT = os.getenv("ENVIRONMENT")
 BUCKET_NAME = os.getenv("BUCKET_NAME")
 DB_NAME = os.getenv("DB_NAME")
 
-# Connect to correct Mongo container based on environment
-client = MongoClient(f"mongodb://mongodb-{ENVIRONMENT}:27017/")
+client = MongoClient("mongodb://mongodb-dev:27017/")
 db = client[DB_NAME]
 collection = db["records"]
 
-# S3 client
 s3 = boto3.client(
     "s3",
     region_name="ap-south-1"
@@ -30,6 +28,7 @@ def home():
         "bucket": BUCKET_NAME,
         "database": DB_NAME
     })
+
 
 @app.route("/add", methods=["POST"])
 def add_student():
@@ -57,9 +56,7 @@ def add_student():
         "environment": ENVIRONMENT
     }
 
-    result = collection.insert_one(student)
-
-    student["_id"] = str(result.inserted_id)
+    collection.insert_one(student)
 
     return jsonify(student)
 
