@@ -1,18 +1,28 @@
 from flask import Flask,request,jsonify
-from flask_cors import CORS
 from pymongo import MongoClient
-import boto3,time,os
+import boto3
+import os
+from werkzeug.utils import secure_filename
 
 app=Flask(__name__)
-CORS(app)
 
-ENVIRONMENT=os.getenv("ENVIRONMENT")
-BUCKET_NAME=os.getenv("BUCKET_NAME")
-DB_NAME=os.getenv("DB_NAME")
+ENV=os.getenv("ENVIRONMENT","dev")
+BUCKET=os.getenv("BUCKET_NAME",f"clickops-bucket-{ENV}")
+DB_NAME=os.getenv("DB_NAME",f"clickops-{ENV}")
 
-client=MongoClient("mongodb://mongodb:27017/")
+# Environment specific Mongo
+mongo_hosts={
+ "dev":"mongodb-dev",
+ "qa":"mongodb-qa",
+ "prd":"mongodb-prd"
+}
+
+client=MongoClient(
+f"mongodb://{mongo_hosts[ENV]}:27017/"
+)
+
 db=client[DB_NAME]
-collection=db["records"]
+collection=db.students
 
 s3=boto3.client(
 "s3",
@@ -21,41 +31,65 @@ region_name="ap-south-1"
 
 @app.route("/")
 def home():
- return jsonify({
-   "environment":ENVIRONMENT,
-   "bucket":BUCKET_NAME,
-   "database":DB_NAME
- })
+    data=list(
+      collection.find({},{"_id":0})
+    )
+    return jsonify(data)
+
+
+@app.route("/students")
+def students():
+    data=list(
+      collection.find({},{"_id":0})
+    )
+    return jsonify(data)
+
 
 @app.route("/add",methods=["POST"])
-def add_student():
+def add():
 
- name=request.form["name"]
- age=request.form["age"]
- file=request.files["image"]
+    try:
+        name=request.form["name"]
+        age=request.form["age"]
 
- filename=str(int(time.time()))+".jpg"
+        file=request.files["image"]
 
- file.save("/tmp/"+filename)
+        filename=secure_filename(
+           file.filename
+        )
 
- s3.upload_file(
- "/tmp/"+filename,
- BUCKET_NAME,
- filename
- )
+        path="/tmp/"+filename
 
- image_url=f"https://{BUCKET_NAME}.s3.ap-south-1.amazonaws.com/{filename}"
+        file.save(path)
 
- student={
- "name":name,
- "age":age,
- "image":image_url,
- "environment":ENVIRONMENT
- }
+        # upload image to env bucket
+        s3.upload_file(
+            path,
+            BUCKET,
+            filename
+        )
 
- collection.insert_one(student)
+        image_url=f"https://{BUCKET}.s3.ap-south-1.amazonaws.com/{filename}"
 
- return jsonify(student)
+        student={
+          "name":name,
+          "age":age,
+          "image":image_url,
+          "environment":ENV
+        }
+
+        collection.insert_one(student)
+
+        return jsonify({
+          "message":"Student saved successfully",
+          "student":student
+        })
+
+    except Exception as e:
+        return jsonify({
+          "message":str(e)
+        }),500
+
 
 app.run(
 host="0.0.0.0",
