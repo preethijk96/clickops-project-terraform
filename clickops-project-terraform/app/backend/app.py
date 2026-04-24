@@ -18,9 +18,7 @@ DB_NAME=os.getenv(
 f"clickops-{ENVIRONMENT}"
 )
 
-client=MongoClient(
-"mongodb://mongodb:27017/"
-)
+client=MongoClient(f"mongodb://mongodb-{ENVIRONMENT}:27017/")
 
 db=client[DB_NAME]
 collection=db.students
