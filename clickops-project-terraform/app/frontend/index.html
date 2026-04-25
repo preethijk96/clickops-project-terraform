@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>ClickOps Students Form</title>
-
 <style>
 body{
 margin:0;
@@ -14,99 +13,72 @@ justify-content:center;
 align-items:center;
 min-height:100vh;
 }
-
 .container{
-background:white;
+background:#fff;
 padding:35px;
-border-radius:20px;
 width:450px;
+border-radius:20px;
 text-align:center;
-box-shadow:0 8px 25px rgba(0,0,0,.2);
 }
-
 input{
 width:90%;
 padding:12px;
-margin:10px 0;
-border-radius:8px;
-border:1px solid #ccc;
+margin:10px;
 }
-
 button{
 background:#4361ee;
 color:white;
 border:none;
 padding:14px 30px;
 border-radius:8px;
-cursor:pointer;
 }
-
 .student{
 margin-top:15px;
 padding:15px;
 border:1px solid #ddd;
-border-radius:12px;
 }
-
 .student img{
 width:120px;
-border-radius:10px;
-margin-top:10px;
 }
 </style>
 </head>
-
 <body>
 
 <div class="container">
-
 <h2>ClickOps Students Entry Form</h2>
 
 <form id="studentForm">
-<input type="text" name="name" placeholder="Name" required>
-<input type="number" name="age" placeholder="Age" required>
+<input name="name" placeholder="Name" required>
+<input name="age" placeholder="Age" required>
 <input type="file" name="image" required>
 
-<br><br>
-
-<button type="submit">
-Submit
-</button>
-
+<button type="submit">Submit</button>
 </form>
 
-<h3>Student Records</h3>
+<h3>Records</h3>
 <div id="records"></div>
 
 </div>
 
-
 <script>
 
-const API="/";   // automatically uses current environment
-
-
 async function loadRecords(){
-
-let res=await fetch(API+"list");
-let data=await res.json();
+let r=await fetch("/list");
+let data=await r.json();
 
 let html="";
 
-data.forEach(item=>{
-html += `
-<div class="student">
-<b>Name:</b> ${item.name}<br>
-<b>Age:</b> ${item.age}<br>
-<img src="${item.image}">
-</div>
-`;
+data.forEach(x=>{
+html+=`
+<div class='student'>
+<b>Name:</b> ${x.name}<br>
+<b>Age:</b> ${x.age}<br>
+<img src="${x.image}">
+</div>`;
 });
 
 document.getElementById("records").innerHTML=html;
-
 }
-
 
 document.getElementById("studentForm")
 .addEventListener("submit",async function(e){
@@ -115,42 +87,21 @@ e.preventDefault();
 
 let formData=new FormData(this);
 
-try{
-
-let res=await fetch(
-API+"add",
-{
+let res=await fetch("/add",{
 method:"POST",
 body:formData
-}
-);
-
-let data=await res.json();
+});
 
 if(res.ok){
-
 alert("Submit successful!");
-
 this.reset();
-
 loadRecords();
-
-}else{
-
-alert("Submission failed");
-
 }
-
-}catch(err){
-
-alert("Submission failed");
-
-console.log(err);
-
+else{
+alert("Submission Failed");
 }
 
 });
-
 
 loadRecords();
 
