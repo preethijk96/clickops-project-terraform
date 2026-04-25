@@ -8,126 +8,72 @@ import uuid
 app = Flask(__name__)
 CORS(app)
 
-# ----------------------------------
-# Dynamic Environment Configuration
-# ----------------------------------
+ENVIRONMENT = os.getenv("ENVIRONMENT","prd")
+MONGO_HOST  = os.getenv("MONGO_HOST","mongodb-prd")
+DB_NAME     = os.getenv("DB_NAME","clickops-prd")
+BUCKET_NAME = os.getenv("S3_BUCKET","clickops-bucket-prd")
+AWS_REGION  = os.getenv("AWS_REGION","ap-south-1")
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
-
-MONGO_HOST = os.getenv("MONGO_HOST", "mongodb-dev")
-MONGO_URI = os.getenv("MONGO_URI", f"mongodb://{MONGO_HOST}:27017/")
-
-DB_NAME = os.getenv("DB_NAME", f"clickops-{ENVIRONMENT}")
-BUCKET_NAME = os.getenv("BUCKET_NAME", f"clickops-bucket-{ENVIRONMENT}")
-
-AWS_REGION = os.getenv("AWS_REGION", "ap-south-1")
-
-
-# ----------------------------------
-# Mongo Connection
-# ----------------------------------
-
-client = MongoClient(MONGO_URI)
+client = MongoClient(f"mongodb://{MONGO_HOST}:27017/")
 db = client[DB_NAME]
 collection = db.users
-
-
-# ----------------------------------
-# S3 Connection
-# ----------------------------------
 
 s3 = boto3.client(
     "s3",
     region_name=AWS_REGION
 )
 
-
-# ----------------------------------
-# Health Check
-# ----------------------------------
-
-@app.route("/", methods=["GET"])
+@app.route("/")
 def home():
-    return jsonify({
-        "environment": ENVIRONMENT,
-        "database": DB_NAME,
-        "bucket": BUCKET_NAME,
-        "mongo_host": MONGO_HOST
-    })
+    return jsonify({"status":"running"})
 
-
-# ----------------------------------
-# Get Records
-# ----------------------------------
-
-@app.route("/list", methods=["GET"])
+@app.route("/list")
 def list_students():
 
-    students = []
+    records=[]
 
-    for doc in collection.find():
-        students.append({
-            "name": doc["name"],
-            "age": doc["age"],
-            "image": doc["image"]
-        })
+    for doc in collection.find({},{"_id":0}):
+        records.append(doc)
 
-    return jsonify(students)
+    return jsonify(records)
 
 
-# ----------------------------------
-# Add Record + Upload Image to S3
-# ----------------------------------
-
-@app.route("/add", methods=["POST"])
+@app.route("/add",methods=["POST"])
 def add_student():
 
     try:
-        name = request.form["name"]
-        age = request.form["age"]
-        image = request.files["image"]
+        name=request.form["name"]
+        age=request.form["age"]
+        image=request.files["image"]
 
-        filename = str(uuid.uuid4()) + ".jpg"
+        filename=str(uuid.uuid4())+".jpg"
 
+        # Upload image to S3
         s3.upload_fileobj(
             image,
             BUCKET_NAME,
-            filename,
-            ExtraArgs={
-                
-                "ContentType": "image/jpeg"
-            }
+            filename
         )
 
-        image_url = (
-            f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
-        )
+        image_url=f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
 
-        student = {
-            "name": name,
-            "age": age,
-            "image": image_url
-        }
-
-        collection.insert_one(student)
+        # Save to MongoDB
+        collection.insert_one({
+            "name":name,
+            "age":age,
+            "image":image_url
+        })
 
         return jsonify({
-            "message": "Submit successful!"
-        }), 200
+            "message":"Submit successful!"
+        }),200
+
 
     except Exception as e:
-
         return jsonify({
-            "error": str(e)
-        }), 500
+            "error":str(e)
+        }),500
 
 
-# ----------------------------------
-# Run App
-# ----------------------------------
-
-if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=5000
-    )
+if __name__=="__main__":
+    app.run(host="0.0.0.0",port=5000)
