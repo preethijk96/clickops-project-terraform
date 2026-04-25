@@ -1,91 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <title>ClickOps Students Entry Form</title>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
-}
-
 body{
-background:linear-gradient(90deg,#5769e9,#a96bf5);
-min-height:100vh;
-padding-top:55px;
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:linear-gradient(to right,#5c6cf0,#b06cf0);
+ height:100vh;
+ display:flex;
+ justify-content:center;
+ align-items:center;
 }
 
 .container{
-display:flex;
-flex-direction:column;
-align-items:center;
+ background:#fff;
+ width:420px;
+ padding:40px;
+ border-radius:20px;
+ text-align:center;
+ box-shadow:0 8px 30px rgba(0,0,0,.25);
 }
 
-.form-box{
-background:#fff;
-width:420px;
-padding:28px;
-border-radius:15px;
-box-shadow:0 4px 20px rgba(0,0,0,.15);
-text-align:center;
+h1{
+ font-size:34px;
+ margin-bottom:30px;
 }
 
-h2{
-margin-bottom:20px;
-}
-
-input[type=text],
-input[type=number]{
-width:100%;
-padding:10px;
-margin:8px 0;
-border:1px solid #ddd;
-border-radius:4px;
-}
-
-.filebox{
-margin-top:10px;
-text-align:left;
+input{
+ width:90%;
+ padding:14px;
+ margin:10px 0;
+ border:1px solid #ccc;
+ border-radius:8px;
 }
 
 button{
-margin-top:14px;
-background:#4e68ea;
-color:white;
-border:none;
-padding:8px 25px;
-border-radius:5px;
-cursor:pointer;
+ background:#4267d6;
+ color:white;
+ border:none;
+ padding:14px 35px;
+ margin-top:18px;
+ border-radius:8px;
+ cursor:pointer;
+ font-size:16px;
 }
 
-#msg{
-margin-top:15px;
-color:green;
-font-weight:bold;
+button:hover{
+ opacity:.95;
 }
 
 #records{
-width:420px;
-margin-top:15px;
+ margin-top:25px;
+ font-weight:bold;
+ font-size:18px;
 }
 
-.card{
-background:#fff;
-margin-top:12px;
-padding:18px;
-border-radius:12px;
-text-align:center;
-box-shadow:0 3px 10px rgba(0,0,0,.1);
-}
-
-.card img{
-width:90px;
-height:90px;
-object-fit:cover;
-margin-top:10px;
-border-radius:8px;
+#msg{
+ margin-top:15px;
+ font-weight:bold;
 }
 </style>
 </head>
@@ -94,33 +69,31 @@ border-radius:8px;
 
 <div class="container">
 
-<div class="form-box">
+<h1>ClickOps Students Entry Form</h1>
 
-<h2>ClickOps Students Entry Form</h2>
-
-<form id="studentForm">
+<form id="studentForm" enctype="multipart/form-data">
 
 <input
-id="name"
 type="text"
+name="name"
 placeholder="Enter your name"
 required
 >
 
 <input
-id="age"
 type="number"
+name="age"
 placeholder="Enter your age"
 required
 >
 
-<div class="filebox">
 <input
-id="image"
 type="file"
+name="image"
 required
 >
-</div>
+
+<br>
 
 <button type="submit">
 Submit
@@ -130,74 +103,62 @@ Submit
 
 <div id="msg"></div>
 
+<div id="records">
+Records
 </div>
-
-<div id="records"></div>
 
 </div>
 
 <script>
-
-const API="http://65.0.29.134:5001";
-
-document.getElementById(
-"studentForm"
-).addEventListener(
+document
+.getElementById("studentForm")
+.addEventListener(
 "submit",
 async function(e){
 
 e.preventDefault();
 
-let fd=new FormData();
+let formData = new FormData(this);
 
-fd.append(
-"name",
-document.getElementById("name").value
-);
+try{
 
-fd.append(
-"age",
-document.getElementById("age").value
-);
-
-fd.append(
-"image",
-document.getElementById("image").files[0]
-);
-
-let res=await fetch(
-API+"/add",
+const response = await fetch(
+"http://3.110.79.214:5002/add",
 {
 method:"POST",
-body:fd
+body:formData
 }
 );
 
-let data=await res.json();
+if(response.ok){
 
-document.getElementById(
-"msg"
-).innerHTML=
-"Student saved successfully";
+document.getElementById("msg").innerHTML=
+"Submitted Successfully";
 
-document.getElementById(
-"records"
-).innerHTML=
-`
-<div class='card'>
-<h3>${data.user.name}</h3>
-<p>Age ${data.user.age}</p>
-<img src="${data.user.image}">
-</div>
-`;
+alert("Submitted Successfully");
 
-document.getElementById(
-"studentForm"
-).reset();
+this.reset();
+
+}else{
+
+document.getElementById("msg").innerHTML=
+"Submission Failed";
+
+alert("Submission Failed");
+}
 
 }
-);
+catch(error){
 
+document.getElementById("msg").innerHTML=
+"Submission Failed";
+
+alert("Submission Failed");
+
+console.log(error);
+}
+
+});
 </script>
 
 </body>
