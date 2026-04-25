@@ -80,76 +80,73 @@ Submit
 
 <script>
 
+<script>
 const API = `${window.location.protocol}//${window.location.hostname}:5003`;
 
-
 async function loadRecords(){
+ try{
+   let res = await fetch(API + "/list");
+   let data = await res.json();
 
-let res=await fetch(API+"/list");
-let data=await res.json();
+   let html="";
 
-let html="";
+   data.forEach(item=>{
+      html += `
+      <div>
+        <p><b>Name:</b> ${item.name}</p>
+        <p><b>Age:</b> ${item.age}</p>
+        <img src="${item.image}" width="120">
+        <hr>
+      </div>
+      `;
+   });
 
-data.forEach(item=>{
-
-html += `
-<div class="student">
-<b>Name:</b> ${item.name}<br>
-<b>Age:</b> ${item.age}<br>
-<img src="${item.image}">
-</div>
-`;
-
-});
-
-document.getElementById(
-"records"
-).innerHTML=html;
-
+   document.getElementById("records").innerHTML=html;
+ }
+ catch(err){
+   console.log(err);
+ }
 }
 
-
-
-document.getElementById(
-"studentForm"
-).addEventListener(
-"submit",
-async function(e){
+document.getElementById("studentForm")
+.addEventListener("submit", async function(e){
 
 e.preventDefault();
 
-let formData=new FormData(this);
+let formData = new FormData(this);
 
-let res=await fetch(
-API+"/add",
+try{
+
+const response = await fetch(
+API + "/add",
 {
-method:"POST",
-body:formData
+ method:"POST",
+ body:formData
 }
 );
 
-let data=await res.json();
+const data=await response.json();
 
-if(res.ok){
-
-alert("Submit successful!");
-
-this.reset();
-
-loadRecords();
-
+if(response.ok){
+ alert("Submit Successful!");
+ document.getElementById("msg").innerHTML="Submit Successful!";
+ this.reset();
+ loadRecords();
 }
 else{
-
-alert("Submission Failed");
-
+ alert("Submission Failed");
+ console.log(data);
 }
 
+}catch(error){
+ alert("Submission Failed");
+ console.log(error);
 }
-);
 
+});
 
 loadRecords();
+</script>
 
 </script>
 
