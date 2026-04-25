@@ -8,13 +8,19 @@ import uuid
 app = Flask(__name__)
 CORS(app)
 
-# -----------------------------
-# Config
-# -----------------------------
-MONGO_URI = os.getenv("MONGO_URI","mongodb://mongodb-qa:27017/")
-DB_NAME = os.getenv("DB_NAME","clickops-qa")
-BUCKET_NAME = os.getenv("S3_BUCKET","clickops-bucket-qa")
-AWS_REGION = os.getenv("AWS_REGION","ap-south-1")
+# --------------------------------
+# Dynamic config for DEV / QA / PRD
+# --------------------------------
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
+
+MONGO_HOST = os.getenv("MONGO_HOST", "mongodb-dev")
+MONGO_URI = os.getenv("MONGO_URI", f"mongodb://{MONGO_HOST}:27017/")
+
+DB_NAME = os.getenv("DB_NAME", f"clickops-{ENVIRONMENT}")
+BUCKET_NAME = os.getenv("BUCKET_NAME", f"clickops-bucket-{ENVIRONMENT}")
+
+AWS_REGION = os.getenv("AWS_REGION", "ap-south-1")
 
 # Mongo
 client = MongoClient(MONGO_URI)
@@ -27,39 +33,47 @@ s3 = boto3.client(
     region_name=AWS_REGION
 )
 
-# -----------------------------
+# --------------------------------
 # Health Check
-# -----------------------------
+# --------------------------------
+
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({
-        "environment":"qa",
-        "database":DB_NAME,
-        "bucket":BUCKET_NAME
+        "environment": ENVIRONMENT,
+        "database": DB_NAME,
+        "bucket": BUCKET_NAME,
+        "mongo_host": MONGO_HOST
     })
 
-# -----------------------------
+
+# --------------------------------
 # List records
-# -----------------------------
+# --------------------------------
+
 @app.route("/list", methods=["GET"])
 def list_students():
-    students=[]
+
+    students = []
 
     for doc in collection.find():
         students.append({
-            "name":doc["name"],
-            "age":doc["age"],
-            "image":doc["image"]
+            "name": doc["name"],
+            "age": doc["age"],
+            "image": doc["image"]
         })
 
     return jsonify(students)
 
-# -----------------------------
+
+# --------------------------------
 # Add student
-# -----------------------------
+# --------------------------------
+
 @app.route("/add", methods=["POST"])
 def add_student():
     try:
+
         name = request.form["name"]
         age = request.form["age"]
         image = request.files["image"]
@@ -71,30 +85,33 @@ def add_student():
             BUCKET_NAME,
             filename,
             ExtraArgs={
-                "ACL":"public-read",
-                "ContentType":"image/jpeg"
+                "ACL": "public-read",
+                "ContentType": "image/jpeg"
             }
         )
 
         image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
 
         student = {
-            "name":name,
-            "age":age,
-            "image":image_url
+            "name": name,
+            "age": age,
+            "image": image_url
         }
 
         collection.insert_one(student)
 
         return jsonify({
-            "message":"Student saved successfully"
-        }),200
+            "message": "Student saved successfully"
+        }), 200
 
     except Exception as e:
         return jsonify({
-            "error":str(e)
-        }),500
+            "error": str(e)
+        }), 500
 
 
-if __name__=="__main__":
-    app.run(host="0.0.0.0",port=5000)
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=5000
+    )
