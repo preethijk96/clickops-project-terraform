@@ -106,7 +106,7 @@ services:
     environment:
       API_URL: http://13.233.36.111:5003
     ports:
-      - "8083:80"
+      - "80:80"
     depends_on:
       - backend-prd
     networks:
