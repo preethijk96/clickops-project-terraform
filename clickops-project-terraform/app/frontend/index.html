@@ -1,70 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>ClickOps Students Entry Form</title>
+<title>ClickOps Students Form</title>
 
 <style>
 body{
- margin:0;
- font-family:Arial,sans-serif;
- background:linear-gradient(to right,#5c6cf0,#b06cf0);
- height:100vh;
- display:flex;
- justify-content:center;
- align-items:center;
+margin:0;
+font-family:Arial;
+background:linear-gradient(to right,#5c6cf0,#b06cf0);
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
 }
 
 .container{
- background:#fff;
- width:420px;
- padding:40px;
- border-radius:20px;
- text-align:center;
- box-shadow:0 8px 30px rgba(0,0,0,.25);
-}
-
-h1{
- font-size:34px;
- margin-bottom:30px;
+background:white;
+padding:35px;
+border-radius:20px;
+width:450px;
+text-align:center;
+box-shadow:0 8px 25px rgba(0,0,0,.2);
 }
 
 input{
- width:90%;
- padding:14px;
- margin:10px 0;
- border:1px solid #ccc;
- border-radius:8px;
+width:90%;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+border:1px solid #ccc;
 }
 
 button{
- background:#4267d6;
- color:white;
- border:none;
- padding:14px 35px;
- margin-top:18px;
- border-radius:8px;
- cursor:pointer;
- font-size:16px;
+background:#4361ee;
+color:white;
+border:none;
+padding:14px 30px;
+border-radius:8px;
+cursor:pointer;
 }
 
-#records{
- margin-top:25px;
- font-weight:bold;
- font-size:18px;
+.student{
+margin-top:15px;
+padding:15px;
+border:1px solid #ddd;
+border-radius:12px;
 }
 
-.record-card{
- margin-top:15px;
- padding:10px;
- border:1px solid #ddd;
- border-radius:10px;
-}
-
-.record-card img{
- width:120px;
- margin-top:10px;
- border-radius:10px;
+.student img{
+width:120px;
+border-radius:10px;
+margin-top:10px;
 }
 </style>
 </head>
@@ -73,110 +60,94 @@ button{
 
 <div class="container">
 
-<h1>ClickOps Students Entry Form</h1>
+<h2>ClickOps Students Entry Form</h2>
 
-<form id="studentForm" enctype="multipart/form-data">
-
-<input type="text" name="name" placeholder="Enter your name" required>
-
-<input type="number" name="age" placeholder="Enter your age" required>
-
+<form id="studentForm">
+<input type="text" name="name" placeholder="Name" required>
+<input type="number" name="age" placeholder="Age" required>
 <input type="file" name="image" required>
 
-<br>
-
-<button type="submit">Submit</button>
-
+<button type="submit">
+Submit
+</button>
 </form>
 
-<div id="msg"></div>
-
-<div id="records">
-<h3>Records</h3>
-<div id="recordList"></div>
-</div>
+<h3>Student Records</h3>
+<div id="records"></div>
 
 </div>
+
 
 <script>
 
+const API="http://3.6.92.244:5003";
+
+
 async function loadRecords(){
 
-try{
-let res = await fetch("http://3.6.92.244:5003/list");
-let data = await res.json();
+let res=await fetch(API+"/list");
+let data=await res.json();
 
 let html="";
 
 data.forEach(item=>{
+
 html += `
-<div class="record-card">
-<p><b>Name:</b> ${item.name}</p>
-<p><b>Age:</b> ${item.age}</p>
-<img src="${item.image}" />
+<div class="student">
+<b>Name:</b> ${item.name}<br>
+<b>Age:</b> ${item.age}<br>
+<img src="${item.image}">
 </div>
 `;
+
 });
 
-document.getElementById("recordList").innerHTML=html;
-
-}catch(err){
-console.log(err);
-}
+document.getElementById(
+"records"
+).innerHTML=html;
 
 }
 
-document
-.getElementById("studentForm")
-.addEventListener(
+
+
+document.getElementById(
+"studentForm"
+).addEventListener(
 "submit",
 async function(e){
 
 e.preventDefault();
 
-let formData = new FormData(this);
+let formData=new FormData(this);
 
-try{
-
-const response = await fetch(
-"http://3.6.92.244:5003/add",
+let res=await fetch(
+API+"/add",
 {
 method:"POST",
 body:formData
 }
 );
 
-if(response.ok){
+let data=await res.json();
 
-document.getElementById("msg").innerHTML=
-"Submitted Successfully";
+if(res.ok){
 
-alert("Submitted Successfully");
+alert("Submit successful!");
 
 this.reset();
 
 loadRecords();
 
-}else{
-
-document.getElementById("msg").innerHTML=
-"Submission Failed";
-
-alert("Submission Failed");
 }
-
-}
-catch(error){
-
-document.getElementById("msg").innerHTML=
-"Submission Failed";
+else{
 
 alert("Submission Failed");
 
-console.log(error);
 }
 
-});
+}
+);
+
 
 loadRecords();
 
