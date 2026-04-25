@@ -67,9 +67,12 @@ margin-top:10px;
 <input type="number" name="age" placeholder="Age" required>
 <input type="file" name="image" required>
 
+<br><br>
+
 <button type="submit">
 Submit
 </button>
+
 </form>
 
 <h3>Student Records</h3>
@@ -80,73 +83,76 @@ Submit
 
 <script>
 
+const API="/";   // automatically uses current environment
 
-const API = `${window.location.protocol}//${window.location.hostname}:5003`;
 
 async function loadRecords(){
- try{
-   let res = await fetch(API + "/list");
-   let data = await res.json();
 
-   let html="";
+let res=await fetch(API+"list");
+let data=await res.json();
 
-   data.forEach(item=>{
-      html += `
-      <div>
-        <p><b>Name:</b> ${item.name}</p>
-        <p><b>Age:</b> ${item.age}</p>
-        <img src="${item.image}" width="120">
-        <hr>
-      </div>
-      `;
-   });
+let html="";
 
-   document.getElementById("records").innerHTML=html;
- }
- catch(err){
-   console.log(err);
- }
+data.forEach(item=>{
+html += `
+<div class="student">
+<b>Name:</b> ${item.name}<br>
+<b>Age:</b> ${item.age}<br>
+<img src="${item.image}">
+</div>
+`;
+});
+
+document.getElementById("records").innerHTML=html;
+
 }
 
+
 document.getElementById("studentForm")
-.addEventListener("submit", async function(e){
+.addEventListener("submit",async function(e){
 
 e.preventDefault();
 
-let formData = new FormData(this);
+let formData=new FormData(this);
 
 try{
 
-const response = await fetch(
-API + "/add",
+let res=await fetch(
+API+"add",
 {
- method:"POST",
- body:formData
+method:"POST",
+body:formData
 }
 );
 
-const data=await response.json();
+let data=await res.json();
 
-if(response.ok){
- alert("Submit Successful!");
- document.getElementById("msg").innerHTML="Submit Successful!";
- this.reset();
- loadRecords();
-}
-else{
- alert("Submission Failed");
- console.log(data);
+if(res.ok){
+
+alert("Submit successful!");
+
+this.reset();
+
+loadRecords();
+
+}else{
+
+alert("Submission failed");
+
 }
 
-}catch(error){
- alert("Submission Failed");
- console.log(error);
+}catch(err){
+
+alert("Submission failed");
+
+console.log(err);
+
 }
 
 });
 
+
 loadRecords();
-</script>
 
 </script>
 
