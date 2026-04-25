@@ -8,9 +8,9 @@ import uuid
 app = Flask(__name__)
 CORS(app)
 
-# --------------------------------
-# Dynamic config for DEV / QA / PRD
-# --------------------------------
+# ----------------------------------
+# Dynamic Environment Configuration
+# ----------------------------------
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
 
@@ -22,20 +22,29 @@ BUCKET_NAME = os.getenv("BUCKET_NAME", f"clickops-bucket-{ENVIRONMENT}")
 
 AWS_REGION = os.getenv("AWS_REGION", "ap-south-1")
 
-# Mongo
+
+# ----------------------------------
+# Mongo Connection
+# ----------------------------------
+
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 collection = db.users
 
-# S3
+
+# ----------------------------------
+# S3 Connection
+# ----------------------------------
+
 s3 = boto3.client(
     "s3",
     region_name=AWS_REGION
 )
 
-# --------------------------------
+
+# ----------------------------------
 # Health Check
-# --------------------------------
+# ----------------------------------
 
 @app.route("/", methods=["GET"])
 def home():
@@ -47,9 +56,9 @@ def home():
     })
 
 
-# --------------------------------
-# List records
-# --------------------------------
+# ----------------------------------
+# Get Records
+# ----------------------------------
 
 @app.route("/list", methods=["GET"])
 def list_students():
@@ -66,14 +75,14 @@ def list_students():
     return jsonify(students)
 
 
-# --------------------------------
-# Add student
-# --------------------------------
+# ----------------------------------
+# Add Record + Upload Image to S3
+# ----------------------------------
 
 @app.route("/add", methods=["POST"])
 def add_student():
-    try:
 
+    try:
         name = request.form["name"]
         age = request.form["age"]
         image = request.files["image"]
@@ -90,7 +99,9 @@ def add_student():
             }
         )
 
-        image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
+        image_url = (
+            f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
+        )
 
         student = {
             "name": name,
@@ -101,14 +112,19 @@ def add_student():
         collection.insert_one(student)
 
         return jsonify({
-            "message": "Student saved successfully"
+            "message": "Submit successful!"
         }), 200
 
     except Exception as e:
+
         return jsonify({
             "error": str(e)
         }), 500
 
+
+# ----------------------------------
+# Run App
+# ----------------------------------
 
 if __name__ == "__main__":
     app.run(
