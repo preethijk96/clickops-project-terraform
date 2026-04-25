@@ -94,7 +94,7 @@ def add_student():
             BUCKET_NAME,
             filename,
             ExtraArgs={
-                "ACL": "public-read",
+                
                 "ContentType": "image/jpeg"
             }
         )
