@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>ClickOps Students Form</title>
+
 <style>
 body{
 margin:0;
@@ -13,49 +14,89 @@ justify-content:center;
 align-items:center;
 min-height:100vh;
 }
+
 .container{
-background:#fff;
+background:white;
 padding:35px;
-width:450px;
 border-radius:20px;
+width:450px;
 text-align:center;
+box-shadow:0 8px 25px rgba(0,0,0,.2);
 }
+
 input{
 width:90%;
 padding:12px;
-margin:10px;
+margin:10px 0;
+border-radius:8px;
+border:1px solid #ccc;
 }
+
 button{
 background:#4361ee;
 color:white;
 border:none;
 padding:14px 30px;
 border-radius:8px;
+cursor:pointer;
 }
+
 .student{
 margin-top:15px;
 padding:15px;
 border:1px solid #ddd;
+border-radius:12px;
 }
+
 .student img{
 width:120px;
+border-radius:10px;
+margin-top:10px;
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
+
 <h2>ClickOps Students Entry Form</h2>
 
-<form id="studentForm" onsubmit="return false;"></form>
-<input name="name" placeholder="Name" required>
-<input name="age" placeholder="Age" required>
-<input type="file" name="image" required>
+<form id="studentForm" onsubmit="return false;">
 
-<button type="submit">Submit</button>
+<input
+type="text"
+name="name"
+placeholder="Enter your name"
+required
+>
+
+<input
+type="number"
+name="age"
+placeholder="Enter your age"
+required
+>
+
+<input
+type="file"
+name="image"
+required
+>
+
+<br><br>
+
+<button
+type="button"
+onclick="submitForm()"
+>
+Submit
+</button>
+
 </form>
 
 <h3>Records</h3>
+
 <div id="records"></div>
 
 </div>
@@ -63,45 +104,83 @@ width:120px;
 <script>
 
 async function loadRecords(){
-let r=await fetch("/list");
-let data=await r.json();
+
+try{
+
+let res = await fetch("/list");
+let data = await res.json();
 
 let html="";
 
-data.forEach(x=>{
-html+=`
-<div class='student'>
-<b>Name:</b> ${x.name}<br>
-<b>Age:</b> ${x.age}<br>
-<img src="${x.image}">
-</div>`;
+data.forEach(item=>{
+
+html += `
+<div class="student">
+<b>Name:</b> ${item.name}<br>
+<b>Age:</b> ${item.age}<br>
+<img src="${item.image}">
+</div>
+`;
+
 });
 
 document.getElementById("records").innerHTML=html;
+
+}
+catch(err){
+console.log(err);
 }
 
-document.getElementById("studentForm")
-.addEventListener("submit",async function(e){
+}
 
-e.preventDefault();
 
-let formData=new FormData(this);
 
-let res=await fetch("/add",{
+async function submitForm(){
+
+let form=document.getElementById("studentForm");
+
+let formData=new FormData(form);
+
+try{
+
+let res = await fetch(
+"/add",
+{
 method:"POST",
 body:formData
-});
+}
+);
+
+let data=await res.json();
 
 if(res.ok){
+
 alert("Submit successful!");
-this.reset();
+
+form.reset();
+
 loadRecords();
+
 }
 else{
+
 alert("Submission Failed");
+
+console.log(data);
+
 }
 
-});
+}
+catch(e){
+
+alert("Submission Failed");
+
+console.log(e);
+
+}
+
+}
+
 
 loadRecords();
 
