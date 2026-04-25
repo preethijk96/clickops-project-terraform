@@ -9,7 +9,7 @@ secret_name = "mongo-creds-prd"
 repo_name   = "clickops-app"
 environment = "prd"
 ecr_name    = "clickops-ecr-prd"
-root_volume_size = 20
+root_volume_size = 50
 
 instance_name = "clickops-ec2-prd1"
 

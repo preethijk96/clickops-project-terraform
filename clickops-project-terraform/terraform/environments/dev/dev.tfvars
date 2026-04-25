@@ -9,7 +9,7 @@ secret_name = "mongo-creds"
 repo_name   = "clickops-app"
 environment = "dev"
 ecr_name    = "clickops-ecr-dev"
-root_volume_size = 20
+root_volume_size = 50
 
 instance_name = "clickops-ec2-dev1"
 backend_port  = 5001
