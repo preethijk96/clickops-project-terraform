@@ -1,72 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>ClickOps Students Entry Form</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ClickOps Multi Environment App</title>
 
 <style>
-
 body{
-background:linear-gradient(to right,#5b6cf9,#a96ef7);
 font-family:Arial;
+background:#f4f6fb;
+padding:30px;
 text-align:center;
-margin:0;
-padding:0;
 }
 
-.box{
+h1{
+color:#333;
+}
+
+.env{
+margin-bottom:20px;
+font-weight:bold;
+color:#0d6efd;
+}
+
+form{
 background:white;
-width:400px;
+padding:20px;
+max-width:450px;
 margin:auto;
-margin-top:60px;
-padding:30px;
-border-radius:18px;
-box-shadow:0 5px 20px gray;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
 
 input{
 width:90%;
 padding:10px;
-margin:8px;
+margin:10px;
 border:1px solid #ccc;
 border-radius:6px;
 }
 
 button{
-padding:10px 18px;
-border:none;
-border-radius:8px;
-background:#4169e1;
+background:#0d6efd;
 color:white;
+border:none;
+padding:12px 20px;
+border-radius:6px;
 cursor:pointer;
+}
+
+button:hover{
+background:#084298;
+}
+
+#msg{
+margin-top:15px;
+font-weight:bold;
+color:green;
+}
+
+#records{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+margin-top:30px;
+gap:20px;
 }
 
 .card{
 background:white;
-width:300px;
-margin:auto;
-margin-top:20px;
-padding:20px;
-border-radius:15px;
+padding:15px;
+width:220px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
 
+.card img{
+margin-top:10px;
+border-radius:8px;
+max-width:100%;
+}
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="box">
+<h1>ClickOps Student Registration</h1>
 
-<h2>ClickOps Students Entry Form</h2>
+<div class="env" id="environment"></div>
 
 <form id="form" enctype="multipart/form-data">
 
 <input
+type="text"
 name="name"
 placeholder="Enter Name"
 required
 >
 
 <input
+type="number"
 name="age"
 placeholder="Enter Age"
 required
@@ -84,30 +117,39 @@ Submit
 
 </form>
 
-<h3 id="msg"></h3>
+<div id="msg"></div>
 
-</div>
+<h2>Registered Students</h2>
 
 <div id="records"></div>
 
 <script>
 
 const portMap={
- "8081":"5001",
- "8082":"5002",
- "8083":"5003"
+"8081":"5001",
+"8082":"5002",
+"8083":"5003"
 };
+
+const envMap={
+"8081":"DEV Environment",
+"8082":"QA Environment",
+"8083":"PROD Environment"
+};
+
+const currentPort=window.location.port;
+
+document.getElementById("environment").innerHTML=
+envMap[currentPort] || "Environment";
 
 const API=
 window.location.protocol+"//"+
 window.location.hostname+":"+
-portMap[window.location.port];
+portMap[currentPort];
 
-
-
-document.getElementById(
-"form"
-).addEventListener(
+document
+.getElementById("form")
+.addEventListener(
 "submit",
 async function(e){
 
@@ -116,7 +158,10 @@ e.preventDefault();
 let formData=
 new FormData(e.target);
 
-let res=await fetch(
+try{
+
+let res=
+await fetch(
 `${API}/add`,
 {
 method:"POST",
@@ -127,19 +172,28 @@ body:formData
 let data=
 await res.json();
 
-document.getElementById(
-"msg"
-).innerHTML=data.message;
+document
+.getElementById("msg")
+innerHTML=data.message;
 
 e.target.reset();
 
 loadData();
 
 }
+catch(err){
+document
+.getElementById("msg")
+.innerHTML=
+"Error submitting form";
+}
+
+}
 );
 
-
 async function loadData(){
+
+try{
 
 let res=
 await fetch(
@@ -154,19 +208,27 @@ let html="";
 users.forEach(function(u){
 
 html+=`
-<div class='card'>
+<div class="card">
 <h3>${u.name}</h3>
-<p>Age ${u.age}</p>
-<img src="${u.image}" width="150">
-<p>${u.environment}</p>
+<p>Age: ${u.age}</p>
+<img src="${u.image}">
+<p><b>${u.environment}</b></p>
 </div>
 `;
 
 });
 
-document.getElementById(
-"records"
-).innerHTML=html;
+document
+.getElementById("records")
+.innerHTML=html;
+
+}
+catch(err){
+document
+.getElementById("records")
+.innerHTML=
+"<p>Could not load data</p>";
+}
 
 }
 

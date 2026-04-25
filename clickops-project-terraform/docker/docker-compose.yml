@@ -1,83 +1,118 @@
 version: "3.8"
 
 services:
-
   mongodb-dev:
     image: mongo:latest
     container_name: mongodb-dev
     ports:
       - "27017:27017"
+    networks:
+      - clickops-dev
 
   backend-dev:
     build: ../app/backend
     container_name: backend-dev
-    ports:
-      - "5001:5000"
     environment:
       ENVIRONMENT: dev
       BUCKET_NAME: clickops-bucket-dev
       DB_NAME: clickops-dev
-    volumes:
-      - /root/.aws:/root/.aws:ro
+      MONGO_HOST: mongodb-dev
+    ports:
+      - "5001:5000"
     depends_on:
       - mongodb-dev
+    volumes:
+      - /root/.aws:/root/.aws:ro
+    networks:
+      - clickops-dev
 
-  
-frontend-dev:
-  ports:
-    - "80:80"
-
+  frontend-dev:
+    build: ../app/frontend
+    container_name: frontend-dev
+    environment:
+      API_URL: http://13.233.36.111:5001
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend-dev
+    networks:
+      - clickops-dev
 
   mongodb-qa:
     image: mongo:latest
     container_name: mongodb-qa
     ports:
       - "27018:27017"
+    networks:
+      - clickops-qa
 
   backend-qa:
     build: ../app/backend
     container_name: backend-qa
-    ports:
-      - "5002:5000"
     environment:
       ENVIRONMENT: qa
       BUCKET_NAME: clickops-bucket-qa
       DB_NAME: clickops-qa
-    volumes:
-      - /root/.aws:/root/.aws:ro
+      MONGO_HOST: mongodb-qa
+    ports:
+      - "5002:5000"
     depends_on:
       - mongodb-qa
+    volumes:
+      - /root/.aws:/root/.aws:ro
+    networks:
+      - clickops-qa
 
   frontend-qa:
     build: ../app/frontend
     container_name: frontend-qa
+    environment:
+      API_URL: http://13.233.36.111:5002
     ports:
       - "8082:80"
-
-
+    depends_on:
+      - backend-qa
+    networks:
+      - clickops-qa
 
   mongodb-prd:
     image: mongo:latest
     container_name: mongodb-prd
     ports:
       - "27019:27017"
+    networks:
+      - clickops-prd
 
   backend-prd:
     build: ../app/backend
     container_name: backend-prd
-    ports:
-      - "5003:5000"
     environment:
       ENVIRONMENT: prd
       BUCKET_NAME: clickops-bucket-prd
       DB_NAME: clickops-prd
-    volumes:
-      - /root/.aws:/root/.aws:ro
+      MONGO_HOST: mongodb-prd
+    ports:
+      - "5003:5000"
     depends_on:
       - mongodb-prd
+    volumes:
+      - /root/.aws:/root/.aws:ro
+    networks:
+      - clickops-prd
 
   frontend-prd:
     build: ../app/frontend
     container_name: frontend-prd
+    environment:
+      API_URL: http://13.233.36.111:5003
     ports:
       - "8083:80"
+    depends_on:
+      - backend-prd
+    networks:
+      - clickops-prd
+
+networks:
+  clickops-dev:
+  clickops-qa:
+  clickops-prd:
