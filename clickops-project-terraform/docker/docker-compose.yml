@@ -104,7 +104,7 @@ services:
     build: ../app/frontend
     container_name: frontend-prd
     environment:
-      API_URL: http://13.233.36.111:5003
+      API_URL: http://13.233.36.111:5000
     ports:
       - "80:80"
     depends_on:
