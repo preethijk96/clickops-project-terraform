@@ -11,9 +11,9 @@ module "s3" {
 }
 
 module "ecr" {
-  source = "../../modules/ecr"
+  source    = "../../modules/ecr"
 
-  ecr_name = "clickops-ecr-${var.environment}"
+  repo_name = "clickops-ecr-${var.environment}"
 }
 
 module "secrets" {

@@ -1,7 +1,3 @@
-variable "role_name" {
+variable "environment" {
   type = string
-}
-
-variable "policy_arns" {
-  type = list(string)
 }

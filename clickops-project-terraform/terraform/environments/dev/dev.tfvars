@@ -8,11 +8,12 @@ secret_name = "mongo-creds"
 
 repo_name   = "clickops-app"
 environment = "dev"
-ecr_name    = "clickops-ecr-dev"
+
 root_volume_size = 50
 
 instance_name = "clickops-ec2-dev1"
+
 backend_port  = 5001
 frontend_port = 8081
 
-
+vpc_id = "vpc-07d9d8867de4180a8"

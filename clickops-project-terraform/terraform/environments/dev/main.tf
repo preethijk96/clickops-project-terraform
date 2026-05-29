@@ -1,35 +1,44 @@
 module "iam" {
- source = "../iam"
- environment = var.environment
+  source      = "../../modules/iam"
+  environment = var.environment
 }
 
 module "s3" {
- source = "../s3"
- bucket_name = "clickops-bucket-${var.environment}"
- environment = var.environment
+  source      = "../../modules/s3"
+  bucket_name = "clickops-bucket-${var.environment}"
+  
 }
 
 module "ecr" {
- source = "../ecr"
- ecr_name = "clickops-ecr-${var.environment}"
- environment = var.environment
-}
+  source    = "../../modules/ecr"
 
+  repo_name = "clickops-ecr-${var.environment}"
+}
 module "secrets" {
- source = "../secrets"
- secret_name = "mongo-creds-${var.environment}"
- environment = var.environment
+  source = "../../modules/secrets"
+
+  secret_name = "mongo-creds-${var.environment}"
+  environment = var.environment
+
+  username = "admin"
+  password = "password123"
+  host     = "mongodb"
+  port     = 27017
 }
 
 module "ec2" {
- source = "../ec2"
+  source = "../../modules/ec2"
 
- environment       = var.environment
- ami               = var.ami
- instance_type     = var.instance_type
- key_name          = var.key_name
- root_volume_size  = var.root_volume_size
+  instance_name    = var.instance_name
+  environment      = var.environment
 
- frontend_port     = var.frontend_port
- backend_port      = var.backend_port
+  ami              = var.ami
+  instance_type    = var.instance_type
+  key_name         = var.key_name
+  root_volume_size = var.root_volume_size
+
+  frontend_port    = var.frontend_port
+  backend_port     = var.backend_port
+
+  vpc_id           = var.vpc_id
 }

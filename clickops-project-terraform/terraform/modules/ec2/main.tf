@@ -12,49 +12,17 @@ resource "aws_security_group" "clickops_sg" {
   }
 
   ingress {
-    description = "Dev Frontend"
-    from_port   = 8081
-    to_port     = 8081
+    description = "Frontend"
+    from_port   = var.frontend_port
+    to_port     = var.frontend_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description = "QA Frontend"
-    from_port   = 8082
-    to_port     = 8082
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "PRD Frontend"
-    from_port   = 8083
-    to_port     = 8083
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Dev Backend"
-    from_port   = 5001
-    to_port     = 5001
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "QA Backend"
-    from_port   = 5002
-    to_port     = 5002
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "PRD Backend"
-    from_port   = 5003
-    to_port     = 5003
+    description = "Backend"
+    from_port   = var.backend_port
+    to_port     = var.backend_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -68,5 +36,25 @@ resource "aws_security_group" "clickops_sg" {
 
   tags = {
     Name = "${var.instance_name}-sg"
+  }
+}
+
+resource "aws_instance" "ec2" {
+
+  ami                    = var.ami
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+
+  vpc_security_group_ids = [
+    aws_security_group.clickops_sg.id
+  ]
+
+  root_block_device {
+    volume_size = var.root_volume_size
+  }
+
+  tags = {
+    Name        = var.instance_name
+    Environment = var.environment
   }
 }

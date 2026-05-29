@@ -8,15 +8,14 @@ module "s3" {
   source = "../../modules/s3"
 
   bucket_name = "clickops-bucket-${var.environment}"
-  environment = var.environment
-}
+  
 
 module "ecr" {
-  source = "../../modules/ecr"
+  source    = "../../modules/ecr"
 
-  ecr_name    = "clickops-ecr-${var.environment}"
-  environment = var.environment
+  repo_name = "clickops-ecr-${var.environment}"
 }
+
 
 module "secrets" {
   source = "../../modules/secrets"
