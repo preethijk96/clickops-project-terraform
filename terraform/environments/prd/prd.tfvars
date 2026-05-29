@@ -15,6 +15,7 @@ instance_name = "clickops-ec2-prd1"
 
 backend_port  = 5003
 frontend_port = 8083
+vpc_id = "vpc-0daf87b6badf3841a"
 
 
 
