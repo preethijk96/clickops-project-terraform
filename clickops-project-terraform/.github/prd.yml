@@ -1,0 +1,99 @@
+name: Deploy PRD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment: production
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Terraform Init
+        run: |
+          cd terraform/environments/prd
+          terraform init
+
+      - name: Terraform Validate
+        run: |
+          cd terraform/environments/prd
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          cd terraform/environments/prd
+          terraform plan -var-file=prd.tfvars
+
+      - name: Terraform Apply
+        run: |
+          cd terraform/environments/prd
+          terraform apply -auto-approve -var-file=prd.tfvars
+
+      - name: Login To Amazon ECR
+        run: |
+          aws ecr get-login-password \
+          | docker login \
+          --username AWS \
+          --password-stdin ${{ secrets.ECR_URL }}
+
+      - name: Build Frontend Image
+        run: |
+          docker build -t frontend-prd ./app/frontend
+
+      - name: Build Backend Image
+        run: |
+          docker build -t backend-prd ./app/backend
+
+      - name: Tag Frontend Image
+        run: |
+          docker tag frontend-prd:latest \
+          ${{ secrets.PRD_FRONTEND_REPO }}:latest
+
+      - name: Tag Backend Image
+        run: |
+          docker tag backend-prd:latest \
+          ${{ secrets.PRD_BACKEND_REPO }}:latest
+
+      - name: Push Frontend Image
+        run: |
+          docker push \
+          ${{ secrets.PRD_FRONTEND_REPO }}:latest
+
+      - name: Push Backend Image
+        run: |
+          docker push \
+          ${{ secrets.PRD_BACKEND_REPO }}:latest
+
+      - name: Deploy Backend To PRD
+        run: |
+          aws ssm send-command \
+            --instance-ids "${{ secrets.PRD_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin '${{ secrets.ECR_URL }}'",
+              "docker pull '${{ secrets.PRD_BACKEND_REPO }}':latest",
+              "docker stop backend || true",
+              "docker rm backend || true",
+              "docker run -d --restart unless-stopped --name backend -p 5000:5000 '${{ secrets.PRD_BACKEND_REPO }}':latest"
+            ]'
+
+      - name: Health Check
+        run: |
+          sleep 30
+          echo "PRD Deployment Completed"
